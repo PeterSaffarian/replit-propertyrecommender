@@ -77,7 +77,7 @@ def main():
         return
 
     # 6. Persist the profile to disk
-    output_path = Path.cwd() / "property_profile.json"
+    output_path = Path.cwd() / "user_profile.json"
     try:
         output_path.write_text(json.dumps(profile, indent=2), encoding="utf-8")
         print(f"✅ Profile successfully saved to {output_path}")

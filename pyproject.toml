@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "jsonschema>=4.23.0",
+    "openai>=1.79.0",
     "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
     "requests-oauthlib>=2.0.0",
 ]

@@ -16,6 +16,13 @@ from typing import List, Dict, Any, Optional
 from openai import OpenAI
 from jsonschema import validate, ValidationError
 
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables from .env file
+env_path = Path(__file__).parents[3] / '.env'
+load_dotenv(env_path)
+
 # Global OpenAI client, initialized in the constructor
 client: Optional[OpenAI] = None
 

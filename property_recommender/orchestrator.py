@@ -14,13 +14,13 @@ from pathlib import Path
 import json
 
 # Step 1: Profile collection
-from user_interaction.main import main as collect_profile
+from .user_interaction.main import main as collect_profile
 
 # Step 2: Data gathering
-from data_gathering.orchestrator import run_pipeline as gather_data
+from .data_gathering.orchestrator import run_pipeline as gather_data
 
 # Step 3: Match reasoning
-from match_reasoning.orchestrator import run_matching as match_properties
+from .match_reasoning.orchestrator import run_matching as match_properties
 
 def main():
     parser = argparse.ArgumentParser(

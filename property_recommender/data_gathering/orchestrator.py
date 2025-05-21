@@ -15,9 +15,9 @@ import json
 import sys
 from pathlib import Path
 
-from property_recommender.data_gathering.features.query_builder.query_builder import QueryBuilder
-from property_recommender.data_gathering.features.fetch_executor.fetch_executor import FetchExecutor
-from property_recommender.data_gathering.features.data_normalizer.data_normalizer import DataNormalizer
+from .features.query_builder.query_builder import QueryBuilder
+from .features.fetch_executor.fetch_executor import FetchExecutor
+from .features.data_normalizer.data_normalizer import DataNormalizer
 
 
 def run_pipeline(

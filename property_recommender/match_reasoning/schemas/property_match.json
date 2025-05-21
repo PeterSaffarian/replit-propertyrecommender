@@ -1,3 +1,35 @@
 {
-  
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Property Match",
+  "description": "Schema for match results: an array of property match entries.",
+  "type": "object",
+  "properties": {
+    "matches": {
+      "type": "array",
+      "description": "List of matched property entries.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "property_id": {
+            "type": ["string", "integer"],
+            "description": "Unique identifier of the property listing."
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Match score between 0 (no match) and 1 (perfect match)."
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Brief explanation of why this property received its score."
+          }
+        },
+        "required": ["property_id", "score", "rationale"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["matches"],
+  "additionalProperties": false
 }

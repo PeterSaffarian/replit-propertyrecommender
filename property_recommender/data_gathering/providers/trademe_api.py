@@ -33,6 +33,10 @@ import os
 import json
 from pathlib import Path
 from typing import Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(Path(__file__).parents[2] / '.env')
 
 import requests
 from requests_oauthlib import OAuth1Session

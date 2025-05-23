@@ -17,7 +17,7 @@ import json
 from .user_interaction.main import main as collect_profile
 
 # Step 2: Data gathering
-from .data_gathering.orchestrator import main as gather_data
+from .data_gathering.orchestrator import run_pipeline as gather_data
 
 # Step 3: Match reasoning
 from .match_reasoning.orchestrator import run_matching as match_properties

@@ -7,6 +7,7 @@ This module handles executing Trade Me property search requests:
   3. Returns raw property JSON objects.
 """
 import time
+import json
 import logging
 from typing import List, Dict, Any, Optional
 

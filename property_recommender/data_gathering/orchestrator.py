@@ -10,7 +10,7 @@ Top-level orchestrator for the property-recommender pipeline:
   6. Saves intermediate files and all fetched raw properties to raw_properties.json.
 
 Usage:
-  python orchestrator.py
+  python -m property_recommender.data_gathering.orchestrator
 
 Dependencies:
   - OpenAI API credentials (via OPENAI_API_KEY env var).
@@ -46,29 +46,31 @@ def confirm_location_mapping(match_hints: dict, model: str, temperature: float) 
         model: OpenAI model name
         temperature: LLM temperature
     Returns:
-        {"approved": bool, "correction": {<field>: <value>, ...}} JSON-parsed
+        {"approved": bool, "correction": {<level>: <value>, ...}}
     """
-    # Build a descriptive prompt
+    # Build description of mapping
     desc = []
     for level in ("region", "district", "suburb"):
         hint = match_hints.get(level, {})
-        desc.append(f"{level.title()}: user input={hint.get('input')!r}, candidate={hint.get('candidate')!r}")
+        desc.append(
+            f"{level.title()}: user input={hint.get('input')!r}, candidate={hint.get('candidate')!r}"  
+        )
     system_prompt = (
-        "You are a metadata-mapping assistant. A user’s location preferences "
-        "have been interpreted as follows:\n" + "\n".join(desc) +
-        "\nPlease confirm whether this full mapping is correct."
+        "You are a metadata-mapping assistant. A user’s location preferences have been interpreted as follows:\n"
+        + "\n".join(desc)
+        + "\nPlease confirm whether this full mapping is correct."
     )
     user_prompt = (
-        "Respond ONLY in JSON. If the mapping is correct, output {\"approved\": true}."
-        "If not, output {\"approved\": false, \"correction\": {\"level\": \"PreferredName\"}}"
+        "Respond ONLY in JSON. If the mapping is correct, output {\"approved\": true}. "
+        "If not, output {\"approved\": false, \"correction\": {\"level\": \"CorrectName\"}}"
     )
     client = OpenAI()
     resp = client.chat.completions.create(
         model=model,
         temperature=temperature,
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "system",  "content": system_prompt},
+            {"role": "user",    "content": user_prompt},
         ],
     )
     content = resp.choices[0].message.content
@@ -88,7 +90,7 @@ def main(
 ):
     logger.info("Starting property-recommender orchestration...")
 
-    # Resolve paths and project root
+    # Resolve paths
     project_root = Path(__file__).parent.parent.parent
     user_profile_path = Path(profile_path) if profile_path else project_root / "user_profile.json"
 
@@ -99,72 +101,65 @@ def main(
         logger.error(f"Failed to load user profile: {e}")
         return
 
-    # Step 1: Run LLM-based User Agent
+    # Step 1: User Agent
     try:
         form = run_user_agent(user_profile_path)
-        # Persist the filled form
-        filled_form_path = Path(__file__).parent / "filled_form.json"
-        filled_form_path.write_text(json.dumps(form, indent=2))
-        logger.info(f"Saved filled form to {filled_form_path}")
+        (Path(__file__).parent / "filled_form.json").write_text(json.dumps(form, indent=2))
+        logger.info("Saved filled form to filled_form.json")
     except Exception as e:
         logger.error(f"User Agent failed: {e}")
         return
 
-    # Fallback: ensure at least one location field
-    if not any(form.get(k) for k in ("region", "district", "suburb")):
-        fallback_loc = (
-            user_profile.get("location") or
-            user_profile.get("city") or
-            user_profile.get("district") or
-            user_profile.get("suburb")
-        )
-        if fallback_loc:
-            form["district"] = fallback_loc
-            logger.info(f"No location from LLM; falling back to district={fallback_loc}")
+    # Fallback location
+    if not any(form.get(k) for k in ("region","district","suburb")):
+        fallback = user_profile.get("location") or user_profile.get("city") or user_profile.get("suburb")
+        if fallback:
+            form["district"] = fallback
+            logger.info(f"No location from LLM; falling back to district={fallback}")
         else:
-            logger.error(
-                "No location provided by LLM or user profile; cannot build scoped query."
-            )
+            logger.error("No location from LLM or profile; aborting.")
             return
 
-    # Step 2: Build search query and save
+    # Step 2: Build query & hints
     try:
         endpoint, params, session, match_hints = build_search_query(form)
-        query_path = Path(__file__).parent / "search_query.json"
-        query_path.write_text(json.dumps({"endpoint": endpoint, "params": params}, indent=2))
-        logger.info(f"Saved search query to {query_path}")
+        (Path(__file__).parent / "search_query.json").write_text(
+            json.dumps({"endpoint": endpoint, "params": params}, indent=2)
+        )
+        logger.info("Saved search query to search_query.json")
     except ValueError as e:
         logger.error(f"Query building failed: {e}")
         return
 
-    # Step 3: Confirm mapping with LLM
+    # Step 3: Confirm mapping
     try:
-        confirmation = confirm_location_mapping(match_hints, model, temperature)
-        if not confirmation.get("approved"):
-            corrections = confirmation.get("correction", {})
-            for level, corrected in corrections.items():
-                form[level] = corrected
-            logger.info(f"Mapping corrections applied: {corrections}")
-            # Rebuild query after corrections
+        conf = confirm_location_mapping(match_hints, model, temperature)
+        if not conf.get("approved"):
+            corrections = conf.get("correction", {})
+            for lvl, val in corrections.items():
+                form[lvl] = val
+            logger.info(f"Applied corrections: {corrections}")
             endpoint, params, session, match_hints = build_search_query(form)
-            query_path.write_text(json.dumps({"endpoint": endpoint, "params": params}, indent=2))
-            logger.info(f"Saved corrected search query to {query_path}")
+            (Path(__file__).parent / "search_query.json").write_text(
+                json.dumps({"endpoint": endpoint, "params": params}, indent=2)
+            )
+            logger.info("Saved corrected search query to search_query.json")
         else:
             logger.info("Location mapping approved by LLM.")
     except Exception as e:
-        logger.error(f"Location confirmation failed: {e}")
+        logger.error(f"Confirmation step failed: {e}")
 
-    # Step 4: Execute fetch
+    # Step 4: Fetch properties
     try:
-        raw_properties = fetch_raw_properties(endpoint, params, session)
+        raw_props = fetch_raw_properties(endpoint, params, session)
     except Exception as e:
         logger.error(f"Fetching properties failed: {e}")
         return
 
-    # Step 5: Save final raw data
-    output_path = Path(raw_output_path) if raw_output_path else project_root.parent / "raw_properties.json"
-    output_path.write_text(json.dumps(raw_properties, indent=2))
-    logger.info(f"Saved {len(raw_properties)} properties to {output_path}")
+    # Step 5: Save raw data
+    out_path = Path(raw_output_path) if raw_output_path else project_root.parent / "raw_properties.json"
+    out_path.write_text(json.dumps(raw_props, indent=2))
+    logger.info(f"Saved {len(raw_props)} properties to {out_path}")
 
 
 if __name__ == "__main__":

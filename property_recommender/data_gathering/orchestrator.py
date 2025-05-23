@@ -20,9 +20,9 @@ import json
 import logging
 from pathlib import Path
 
-from data_gathering.features.user_agent.user_agent import run_user_agent
-from data_gathering.features.query_builder.query_builder import build_search_query
-from data_gathering.features.fetch_executor.fetch_executor import fetch_raw_properties
+from property_recommender.data_gathering.features.user_agent.user_agent import run_user_agent
+from property_recommender.data_gathering.features.query_builder.query_builder import build_search_query
+from property_recommender.data_gathering.features.fetch_executor.fetch_executor import fetch_raw_properties
 
 # Configure logging
 logging.basicConfig(

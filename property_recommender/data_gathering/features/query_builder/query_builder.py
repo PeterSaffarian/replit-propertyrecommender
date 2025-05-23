@@ -16,14 +16,13 @@ Raises:
 import logging
 import difflib
 from typing import Tuple, Union, Dict, Any
+from requests_oauthlib import OAuth1Session
 
 from property_recommender.data_gathering.providers.trademe_api import (
     BASE_URL,
     SEARCH_PATH,
     get_oauth_session,
     get_regions,
-    get_property_types,
-    get_sales_methods,
 )
 
 logger = logging.getLogger(__name__)
@@ -182,48 +181,26 @@ def build_params_from_form(form: dict) -> Tuple[dict, dict]:
         if form.get(form_key) is not None:
             params[param_key] = form.get(form_key)
 
-    # Property types
+    # Property types - pass through as text for now
     types = form.get("property_types")
     if types:
         vals = types if isinstance(types, list) else [types]
-        valid = get_property_types()
-        choices = {item.get("Key", item.get("Value", "")): item for item in valid}
-        selected = []
-        for v in vals:
-            if v in choices:
-                selected.append(v)
-            else:
-                m = next((k for k in choices if k.lower() == v.lower()), None)
-                if m:
-                    selected.append(m)
-                else:
-                    raise ValueError(f"Unknown property_type: {v}")
-        params["property_type"] = ",".join(selected)
+        # For now, just pass the property types as comma-separated text
+        params["property_type"] = ",".join(vals)
 
-    # Sales methods
+    # Sales methods - pass through as text for now  
     methods = form.get("sales_methods")
     if methods:
         vals = methods if isinstance(methods, list) else [methods]
-        valid = get_sales_methods()
-        choices = {item.get("Key", item.get("Value", "")): item for item in valid}
-        selected = []
-        for v in vals:
-            if v in choices:
-                selected.append(v)
-            else:
-                m = next((k for k in choices if k.lower() == v.lower()), None)
-                if m:
-                    selected.append(m)
-                else:
-                    raise ValueError(f"Unknown sales_method: {v}")
-        params["sale_method"] = ",".join(selected)
+        # For now, just pass the sales methods as comma-separated text
+        params["sale_method"] = ",".join(vals)
 
     return params, match_hints
 
 
 def build_search_query(
     form: dict
-) -> Tuple[str, dict, Union['OAuth1Session', None], dict]:
+) -> Tuple[str, dict, Union[OAuth1Session, None], dict]:
     """
     Build the full search endpoint, parameters, session, and mapping hints.
 

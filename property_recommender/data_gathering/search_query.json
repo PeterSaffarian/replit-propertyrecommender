@@ -1,0 +1,11 @@
+{
+  "endpoint": "https://api.tmsandbox.co.nz/v1/search/property/residential.json",
+  "params": {
+    "suburb": 2165,
+    "district": 60,
+    "region": 3,
+    "price_max": 1000000,
+    "bathrooms_min": 2,
+    "property_type": "House"
+  }
+}

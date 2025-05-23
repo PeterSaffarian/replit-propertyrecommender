@@ -10,20 +10,14 @@ Key functions:
 
 Raises:
   - ValueError on unmappable form values.
-
-Usage:
-  from data_gathering.features.query_builder.query_builder import build_search_query
-  endpoint, params, session = build_search_query(form)
-  response = session.get(endpoint, params=params)
 """
+
 import logging
 from typing import Tuple, Union
-from requests_oauthlib import OAuth1Session
 
-from property_recommender.data_gathering.providers.trademe_api import (
+from data_gathering.providers.trademe_api import (
     BASE_URL,
     get_oauth_session,
-    get_suburbs,
     get_regions,
     get_property_types,
     get_sales_methods,
@@ -49,57 +43,112 @@ def build_params_from_form(form: dict) -> dict:
         ValueError: If a form value cannot be mapped to metadata.
     """
     params = {}
-    # Location mapping
-    loc = form.get("location", {})
-    if "suburb" in loc:
-        name = loc["suburb"]
-        suburbs = get_suburbs()
-        match = next((s for s in suburbs if s.get("Name", "").lower() == name.lower()), None)
-        if not match:
-            raise ValueError(f"Unknown suburb: {name}")
-        params["suburb"] = match["SuburbId"]
-    elif "city" in loc:
-        # Treat city as region
-        name = loc["city"]
-        regions = get_regions()
-        match = next((r for r in regions if r.get("Name", "").lower() == name.lower()), None)
-        if not match:
-            raise ValueError(f"Unknown city/region: {name}")
-        params["region"] = match["RegionId"]
-    elif "region" in loc:
-        name = loc["region"]
-        regions = get_regions()
-        match = next((r for r in regions if r.get("Name", "").lower() == name.lower()), None)
-        if not match:
-            raise ValueError(f"Unknown region: {name}")
-        params["region"] = match["RegionId"]
 
-    if loc.get("nearby_suburbs"):
-        params["adjacent_suburbs"] = True
+    # Extract location fields
+    form_region = form.get("region")
+    form_district = form.get("district")
+    form_suburb = form.get("suburb")
+
+    region_obj = None
+    district_obj = None
+    suburb_obj = None
+
+    regions = get_regions()
+
+    # 1) Try matching suburb first
+    if form_suburb:
+        for r in regions:
+            for d in r.get("Districts", []):
+                for s in d.get("Suburbs", []):
+                    if s.get("Name", "").lower() == form_suburb.lower():
+                        region_obj = r
+                        district_obj = d
+                        suburb_obj = s
+                        break
+                if suburb_obj:
+                    break
+            if suburb_obj:
+                break
+
+    # 2) Try matching district
+    if not suburb_obj and form_district:
+        for r in regions:
+            for d in r.get("Districts", []):
+                if d.get("Name", "").lower() == form_district.lower():
+                    region_obj = r
+                    district_obj = d
+                    break
+            if district_obj:
+                break
+
+    # 3) Try matching region
+    if not region_obj and form_region:
+        region_obj = next(
+            (r for r in regions if r.get("Name", "").lower() == form_region.lower()),
+            None
+        )
+
+    # 4) Fallback: region field may contain district or suburb
+    if not region_obj and form_region:
+        # District fallback
+        for r in regions:
+            for d in r.get("Districts", []):
+                if d.get("Name", "").lower() == form_region.lower():
+                    region_obj = r
+                    district_obj = d
+                    break
+            if region_obj:
+                break
+
+    if not region_obj and form_region:
+        # Suburb fallback
+        for r in regions:
+            for d in r.get("Districts", []):
+                for s in d.get("Suburbs", []):
+                    if s.get("Name", "").lower() == form_region.lower():
+                        region_obj = r
+                        district_obj = d
+                        suburb_obj = s
+                        break
+                if suburb_obj:
+                    break
+            if suburb_obj:
+                break
+
+    # Populate region/district/suburb parameters
+    if suburb_obj:
+        params["suburb"] = suburb_obj.get("SuburbId")
+    elif district_obj:
+        params["district"] = district_obj.get("DistrictId")
+    elif region_obj:
+        params["region"] = region_obj.get("LocalityId")
 
     # Numeric ranges
-    for key, pmin, pmax in [
-        ("price_range", "price_min", "price_max"),
-        ("bedroom_range", "bedrooms_min", "bedrooms_max"),
-        ("bathroom_range", "bathrooms_min", "bathrooms_max"),
-        ("parking_range", "car_spaces_min", "car_spaces_max"),
-    ]:
-        rng = form.get(key)
-        if isinstance(rng, dict):
-            if rng.get("min") is not None:
-                params[pmin] = rng["min"]
-            if rng.get("max") is not None:
-                params[pmax] = rng["max"]
+    if form.get("min_price") is not None:
+        params["price_min"] = form["min_price"]
+    if form.get("max_price") is not None:
+        params["price_max"] = form["max_price"]
+    if form.get("min_bedrooms") is not None:
+        params["bedrooms_min"] = form["min_bedrooms"]
+    if form.get("max_bedrooms") is not None:
+        params["bedrooms_max"] = form["max_bedrooms"]
+    if form.get("min_bathrooms") is not None:
+        params["bathrooms_min"] = form["min_bathrooms"]
+    if form.get("max_bathrooms") is not None:
+        params["bathrooms_max"] = form["max_bathrooms"]
+    if form.get("min_carparks") is not None:
+        params["car_spaces_min"] = form["min_carparks"]
+    if form.get("max_carparks") is not None:
+        params["car_spaces_max"] = form["max_carparks"]
+
+    # Adjacent suburbs if suburb was specified
+    if suburb_obj and form.get("adjacent_suburbs"):
+        params["adjacent_suburbs"] = True
 
     # Property type(s)
-    ptype = form.get("property_type")
-    if ptype:
-        # Accept string or list
-        if isinstance(ptype, list):
-            vals = ptype
-        else:
-            vals = [ptype]
-        # Validate against metadata
+    types = form.get("property_types")
+    if types:
+        vals = types if isinstance(types, list) else [types]
         valid = get_property_types()
         choices = {item.get("Key", item.get("Value", "")): item for item in valid}
         selected = []
@@ -107,7 +156,6 @@ def build_params_from_form(form: dict) -> dict:
             if v in choices:
                 selected.append(v)
             else:
-                # try case-insensitive
                 match = next((k for k in choices if k.lower() == v.lower()), None)
                 if match:
                     selected.append(match)
@@ -115,25 +163,29 @@ def build_params_from_form(form: dict) -> dict:
                     raise ValueError(f"Unknown property_type: {v}")
         params["property_type"] = ",".join(selected)
 
-    # Sales method
-    sm = form.get("sales_method")
-    if sm:
-        methods = get_sales_methods()
-        valid = {item.get("Key", item.get("Value", "")): item for item in methods}
-        if sm in valid:
-            params["sales_method"] = sm
-        else:
-            match = next((k for k in valid if k.lower() == sm.lower()), None)
-            if match:
-                params["sales_method"] = match
+    # Sales method(s)
+    methods = form.get("sales_methods")
+    if methods:
+        vals = methods if isinstance(methods, list) else [methods]
+        valid = get_sales_methods()
+        choices = {item.get("Key", item.get("Value", "")): item for item in valid}
+        selected = []
+        for v in vals:
+            if v in choices:
+                selected.append(v)
             else:
-                raise ValueError(f"Unknown sales_method: {sm}")
+                match = next((k for k in choices if k.lower() == v.lower()), None)
+                if match:
+                    selected.append(match)
+                else:
+                    raise ValueError(f"Unknown sales_method: {v}")
+        params["sales_method"] = ",".join(selected)
 
     logger.info(f"Built query parameters: {params}")
     return params
 
 
-def build_search_query(form: dict) -> Tuple[str, dict, Union[OAuth1Session, None]]:
+def build_search_query(form: dict) -> Tuple[str, dict, Union['OAuth1Session', None]]:
     """
     Build the full search endpoint, parameters, and authenticated session.
 
@@ -146,5 +198,3 @@ def build_search_query(form: dict) -> Tuple[str, dict, Union[OAuth1Session, None
     endpoint = f"{BASE_URL}{SEARCH_PATH}"
     params = build_params_from_form(form)
     return endpoint, params, session
-
-# End of query_builder.py

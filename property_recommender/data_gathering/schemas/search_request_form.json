@@ -1,89 +1,70 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "SearchRequestForm",
-  "description": "Schema for LLM to fill out with user search preferences (all fields optional).",
+  "title": "Trade Me Property Search Request",
+  "description": "Schema for the LLM to emit a property-search form, with all fields optional.",
   "type": "object",
   "properties": {
-    "location": {
-      "type": "object",
-      "description": "Location filters for the search.",
-      "properties": {
-        "suburb": {
-          "type": "string",
-          "description": "Suburb name as understood by Trade Me."
-        },
-        "city": {
-          "type": "string",
-          "description": "City name."
-        },
-        "region": {
-          "type": "string",
-          "description": "Region name."
-        },
-        "nearby_suburbs": {
-          "type": "boolean",
-          "description": "Include adjacent suburbs in search."
-        }
-      },
-      "additionalProperties": false
-    },
-    "price_range": {
-      "type": "object",
-      "description": "Price range filters in NZD.",
-      "properties": {
-        "min": {
-          "type": "number",
-          "minimum": 0,
-          "description": "Minimum price."
-        },
-        "max": {
-          "type": "number",
-          "minimum": 0,
-          "description": "Maximum price."
-        }
-      },
-      "additionalProperties": false
-    },
-    "bedroom_range": {
-      "type": "object",
-      "description": "Bedroom count range.",
-      "properties": {
-        "min": { "type": "integer", "minimum": 0 },
-        "max": { "type": "integer", "minimum": 0 }
-      },
-      "additionalProperties": false
-    },
-    "bathroom_range": {
-      "type": "object",
-      "description": "Bathroom count range.",
-      "properties": {
-        "min": { "type": "integer", "minimum": 0 },
-        "max": { "type": "integer", "minimum": 0 }
-      },
-      "additionalProperties": false
-    },
-    "parking_range": {
-      "type": "object",
-      "description": "Parking/garage count range.",
-      "properties": {
-        "min": { "type": "integer", "minimum": 0 },
-        "max": { "type": "integer", "minimum": 0 }
-      },
-      "additionalProperties": false
-    },
-    "property_type": {
-      "oneOf": [
-        { "type": "string" },
-        {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      ],
-      "description": "Property type filter(s), e.g., House, Apartment."
-    },
-    "sales_method": {
+    "region": {
       "type": "string",
-      "description": "Sales method filter, e.g., auction, tender."
+      "description": "Top-level Trade Me region name (e.g., \"Canterbury\")."
+    },
+    "district": {
+      "type": "string",
+      "description": "District or city within the chosen region (e.g., \"Christchurch\")."
+    },
+    "suburb": {
+      "type": "string",
+      "description": "Suburb within the chosen district (e.g., \"Addington\")."
+    },
+    "min_price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minimum listing price in NZD."
+    },
+    "max_price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Maximum listing price in NZD."
+    },
+    "min_bedrooms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minimum number of bedrooms."
+    },
+    "max_bedrooms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Maximum number of bedrooms."
+    },
+    "min_bathrooms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minimum number of bathrooms."
+    },
+    "max_bathrooms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Maximum number of bathrooms."
+    },
+    "min_carparks": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minimum number of carparks."
+    },
+    "max_carparks": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Maximum number of carparks."
+    },
+    "property_types": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of desired property type keys, as returned by Trade Me metadata."
+    },
+    "sales_methods": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of desired sales method keys, as returned by Trade Me metadata."
     }
   },
   "additionalProperties": false

@@ -1,8 +1,7 @@
 {
-  "location": "Christchurch",
-  "price_min": 0,
+  "location": "Christchurch, Ilam",
+  "price_min": 300000,
   "price_max": 850000,
   "bedrooms_min": 3,
-  "bathrooms_min": 2,
-  "move_in_date": "2023-11-01"
+  "bathrooms_min": 2
 }

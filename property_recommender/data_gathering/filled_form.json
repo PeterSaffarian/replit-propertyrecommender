@@ -1,8 +1,8 @@
 {
   "district": "Christchurch",
-  "suburb": "Christchurch Central",
-  "min_price": 500000,
-  "max_price": 1000000,
-  "min_bedrooms": 1,
+  "suburb": "Ilam",
+  "min_price": 300000,
+  "max_price": 850000,
+  "min_bedrooms": 3,
   "min_bathrooms": 2
 }

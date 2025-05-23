@@ -2,7 +2,7 @@
   "district": "Christchurch",
   "suburb": "Christchurch Central",
   "min_price": 500000,
-  "max_price": 700000,
-  "min_bedrooms": 3,
+  "max_price": 1000000,
+  "min_bedrooms": 1,
   "min_bathrooms": 2
 }

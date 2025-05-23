@@ -1,7 +1,7 @@
 {
   "location": "Christchurch, city center",
   "price_min": 500000,
-  "price_max": 700000,
-  "bedrooms_min": 3,
+  "price_max": 1000000,
+  "bedrooms_min": 1,
   "bathrooms_min": 2
 }

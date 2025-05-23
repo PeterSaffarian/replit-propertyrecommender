@@ -13,8 +13,9 @@ from pathlib import Path
 # load the profile schema that the LLM must adhere to
 SCHEMA_FILE = (
     Path(__file__)
+    .parent        # .../user_agent
     .parent        # .../features
-    .parent        # .../user_interaction
+    .parent        # .../data_gathering
     .parent        # .../property_recommender
     / "user_interaction"
     / "schemas"

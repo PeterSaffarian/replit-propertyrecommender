@@ -93,9 +93,9 @@ def fetch_metadata_from_api(metadata_type: str) -> dict:
     elif key == "suburbs":
         url = f"{BASE_URL}/Localities/Suburbs.json"
     elif key == "propertytypes":
-        url = f"{BASE_URL}/Categories.json"  # Use Categories endpoint instead
+        url = f"{BASE_URL}/Categories/Property.json"  # Use Property categories
     elif key == "salesmethods":
-        url = f"{BASE_URL}/Categories.json"  # Use Categories endpoint for now
+        url = f"{BASE_URL}/Categories/Property.json"  # Use Property categories
     else:
         raise ValueError(f"Unknown metadata type: {metadata_type!r}")
 

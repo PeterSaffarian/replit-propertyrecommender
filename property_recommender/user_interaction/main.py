@@ -20,12 +20,12 @@ from pathlib import Path
 # Ensure root package path for imports
 sys.path.append(dirname(dirname(__file__)))
 
-from user_interaction.features.prompts import (
+from property_recommender.user_interaction.features.prompts import (
     SYSTEM_PROMPT,
     FINAL_FUNCTION_NAME,
     FINAL_FUNCTION_DESCRIPTION,
 )
-from user_interaction.features.chat_handler.chat_handler import ChatHandler
+from property_recommender.user_interaction.features.chat_handler.chat_handler import ChatHandler
 
 
 def main():

@@ -18,8 +18,9 @@ Usage:
 """
 import logging
 from typing import Tuple, Union
+from requests_oauthlib import OAuth1Session
 
-from data_gathering.providers.trademe_api import (
+from property_recommender.data_gathering.providers.trademe_api import (
     BASE_URL,
     get_oauth_session,
     get_suburbs,
@@ -132,7 +133,7 @@ def build_params_from_form(form: dict) -> dict:
     return params
 
 
-def build_search_query(form: dict) -> Tuple[str, dict, Union['OAuth1Session', None]]:
+def build_search_query(form: dict) -> Tuple[str, dict, Union[OAuth1Session, None]]:
     """
     Build the full search endpoint, parameters, and authenticated session.
 

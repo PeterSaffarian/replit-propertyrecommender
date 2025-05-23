@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SearchRequestForm",
+  "description": "Schema for LLM to fill out with user search preferences (all fields optional).",
+  "type": "object",
+  "properties": {
+    "location": {
+      "type": "object",
+      "description": "Location filters for the search.",
+      "properties": {
+        "suburb": {
+          "type": "string",
+          "description": "Suburb name as understood by Trade Me."
+        },
+        "city": {
+          "type": "string",
+          "description": "City name."
+        },
+        "region": {
+          "type": "string",
+          "description": "Region name."
+        },
+        "nearby_suburbs": {
+          "type": "boolean",
+          "description": "Include adjacent suburbs in search."
+        }
+      },
+      "additionalProperties": false
+    },
+    "price_range": {
+      "type": "object",
+      "description": "Price range filters in NZD.",
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Minimum price."
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum price."
+        }
+      },
+      "additionalProperties": false
+    },
+    "bedroom_range": {
+      "type": "object",
+      "description": "Bedroom count range.",
+      "properties": {
+        "min": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "bathroom_range": {
+      "type": "object",
+      "description": "Bathroom count range.",
+      "properties": {
+        "min": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "parking_range": {
+      "type": "object",
+      "description": "Parking/garage count range.",
+      "properties": {
+        "min": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "property_type": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ],
+      "description": "Property type filter(s), e.g., House, Apartment."
+    },
+    "sales_method": {
+      "type": "string",
+      "description": "Sales method filter, e.g., auction, tender."
+    }
+  },
+  "additionalProperties": false
+}

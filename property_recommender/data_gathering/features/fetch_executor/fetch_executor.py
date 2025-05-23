@@ -1,91 +1,129 @@
-#!/usr/bin/env python3
 """
 property_recommender/data_gathering/features/fetch_executor/fetch_executor.py
 
-FetchExecutor fetches raw property listings from the Trade Me Property API,
-based on search parameters produced by the QueryBuilder.
+This module handles executing Trade Me property search requests:
+  1. Executes the search endpoint via OAuth session.
+  2. Handles pagination, rate-limit back-off, and retries.
+  3. Logs progress with timestamps and counts.
+  4. Returns a list of raw property JSON objects.
 
-Responsibilities:
-  1. Invoke the Trade Me API (via trademe_api.search_properties).
-  2. Return the full JSON response for downstream normalization.
-  3. (Optionally) save the raw JSON to disk for inspection or caching.
+Functions:
+  - fetch_raw_properties(endpoint: str, params: dict, session, max_pages: int = None) -> list
+
+Usage:
+  from data_gathering.features.fetch_executor.fetch_executor import fetch_raw_properties
+  raw_props = fetch_raw_properties(endpoint, params, session)
+
 """
+import time
+import logging
+from typing import List, Dict, Any, Optional
 
-import json
-from pathlib import Path
-from typing import Any, Dict, Optional
+# Configure logging with timestamp
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+)
+logger = logging.getLogger(__name__)
 
-from property_recommender.data_gathering.providers.trademe_api import search_properties
+
+class FetchError(Exception):
+    """Raised when fetching fails after retries."""
+    pass
 
 
-class FetchExecutor:
+def fetch_raw_properties(
+    endpoint: str,
+    params: Dict[str, Any],
+    session,
+    max_pages: Optional[int] = None,
+) -> List[Dict[str, Any]]:
     """
-    FetchExecutor for retrieving raw property data from Trade Me.
+    Fetch all pages of search results from Trade Me.
 
-    Workflow:
-      - Initialize with environment (sandbox vs production).
-      - fetch(): call search_properties() and return the JSON.
+    Args:
+        endpoint: Full API URL for the search endpoint.
+        params: Query parameters (excluding 'page').
+        session: Authenticated OAuth1 session.
+        max_pages: Optional cap on number of pages to fetch.
+
+    Returns:
+        List of raw property items (dicts).
+
+    Raises:
+        FetchError: If repeated retries fail for a page.
     """
+    all_items: List[Dict[str, Any]] = []
+    page = 1
 
-    def __init__(
-        self,
-        sandbox: bool = True,
-    ):
-        """
-        Initialize the FetchExecutor.
+    while True:
+        # Prepare params for this page
+        req_params = params.copy()
+        req_params['page'] = page
 
-        Args:
-            sandbox: If True, use the Trade Me sandbox endpoints; otherwise, production.
-        """
-        self.sandbox = sandbox
-
-    def fetch(
-        self,
-        search_params: Dict[str, Any],
-        section: str = "Residential",
-        save_path: Optional[Path] = None
-    ) -> Dict[str, Any]:
-        """
-        Execute a property search and retrieve raw listings.
-
-        Args:
-            search_params:  
-                Dict of query parameters (e.g., price_min, bedrooms_min, suburb).
-            section:  
-                One of 'Residential', 'Rental', 'OpenHomes', etc.
-            save_path:  
-                Optional Path to write the raw JSON response (for caching or debugging).
-
-        Returns:
-            Dict[str, Any]: The parsed JSON response, including keys like 'List',
-                            'TotalCount', 'Page', etc.
-
-        Raises:
-            HTTPError: If the API call fails (status 4xx or 5xx).
-        """
-        # 1. Call Trade Me API via our provider module
-        response = search_properties(
-            section=section,
-            params=search_params,
-            sandbox=self.sandbox
-        )
-
-        # 2. Optionally save the raw response to disk
-        if save_path:
+        retries = 0
+        while True:
             try:
-                save_path.write_text(json.dumps(response, indent=2), encoding="utf-8")
+                logger.info(f"Fetching page {page}...")
+                response = session.get(endpoint, params=req_params)
+                if response.status_code == 429:
+                    # Rate limited
+                    wait = 60  # seconds
+                    logger.warning(f"Rate limited on page {page}. Backing off for {wait}s.")
+                    time.sleep(wait)
+                    retries += 1
+                elif response.status_code >= 500:
+                    # Server error
+                    wait = 5 * (retries + 1)
+                    logger.warning(f"Server error ({response.status_code}) on page {page}. Retrying in {wait}s.")
+                    time.sleep(wait)
+                    retries += 1
+                else:
+                    response.raise_for_status()
+                    break
+                if retries >= 3:
+                    raise FetchError(f"Failed to fetch page {page} after {retries} retries.")
             except Exception as e:
-                # Non-fatal: log and continue
-                print(f"Warning: failed to write raw data to {save_path}: {e}")
+                if retries >= 3:
+                    logger.error(f"Error fetching page {page}: {e}")
+                    raise FetchError(f"Error fetching page {page}: {e}") from e
+                # else, retry
 
-        # 3. Return for normalization
-        return response
+        data = response.json()
+        items = data.get('List', [])
+        count = len(items)
+        logger.info(f"Page {page} fetched: {count} items.")
+
+        all_items.extend(items)
+
+        # Pagination logic
+        total = data.get('TotalCount')
+        page_size = data.get('PageSize')
+        fetched = page * page_size
+
+        if count == 0:
+            logger.info(f"No items on page {page}, ending fetch.")
+            break
+        if max_pages and page >= max_pages:
+            logger.info(f"Reached max_pages={max_pages}, ending fetch.")
+            break
+        if fetched >= total:
+            logger.info(f"Fetched all {total} items across {page} pages.")
+            break
+
+        page += 1
+
+    logger.info(f"Total properties fetched: {len(all_items)}")
+    return all_items
 
 
-# Example standalone usage
-if __name__ == "__main__":
-    # Example: fetch 10 residential listings in suburb 2000
-    executor = FetchExecutor(sandbox=True)
-    params = {"suburb": 2000, "rows": 10}
-    raw = executor.fetch(params, section="Residential", save_path=Path("raw_properties.json"))
-    print(json.dumps(raw, indent=2))
+if __name__ == '__main__':
+    # Example usage (requires real endpoint, params, and session):
+    from data_gathering.features.query_builder.query_builder import build_search_query
+    from data_gathering.providers.trademe_api import get_oauth_session
+
+    # Dummy form for example
+    form = {}
+    endpoint, params, session = build_search_query(form)
+    props = fetch_raw_properties(endpoint, params, session, max_pages=2)
+    print(f"Fetched {len(props)} properties")

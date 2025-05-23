@@ -40,6 +40,9 @@ BASE_URL = (
     else "https://api.tmsandbox.co.nz/v1"
 )
 
+# API endpoints
+SEARCH_PATH = "/search/property/residential.json"
+
 # OAuth1 credentials (from .env)
 CONSUMER_KEY = os.getenv("TRADEME_CONSUMER_KEY")
 CONSUMER_SECRET = os.getenv("TRADEME_CONSUMER_SECRET")

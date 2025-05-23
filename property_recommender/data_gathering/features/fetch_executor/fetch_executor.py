@@ -4,10 +4,18 @@ property_recommender/data_gathering/features/fetch_executor/fetch_executor.py
 This module handles executing Trade Me property search requests:
   1. Executes the search endpoint via OAuth session.
   2. Handles pagination, rate-limit back-off, and retries.
-  3. Returns raw property JSON objects.
+  3. Logs progress with timestamps and counts.
+  4. Returns a list of raw property JSON objects.
+
+Functions:
+  - fetch_raw_properties(endpoint: str, params: dict, session, max_pages: int = None) -> list
+
+Usage:
+  from data_gathering.features.fetch_executor.fetch_executor import fetch_raw_properties
+  raw_props = fetch_raw_properties(endpoint, params, session)
+
 """
 import time
-import json
 import logging
 from typing import List, Dict, Any, Optional
 
@@ -31,7 +39,7 @@ def fetch_raw_properties(
     max_pages: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """
-    Fetch all pages of raw search results from Trade Me.
+    Fetch all pages of search results from Trade Me.
 
     Args:
         endpoint: Full API URL for the search endpoint.
@@ -40,7 +48,7 @@ def fetch_raw_properties(
         max_pages: Optional cap on number of pages to fetch.
 
     Returns:
-        List of raw property items exactly as returned by the API.
+        List of raw property items (dicts).
 
     Raises:
         FetchError: If repeated retries fail for a page.
@@ -84,10 +92,6 @@ def fetch_raw_properties(
         data = response.json()
         items = data.get('List', [])
         count = len(items)
-        # Log complete first item to see all available fields
-        if page == 1 and items:
-            logger.info("First item complete response:")
-            logger.info(json.dumps(items[0], indent=2))
         logger.info(f"Page {page} fetched: {count} items.")
 
         all_items.extend(items)

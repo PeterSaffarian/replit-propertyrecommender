@@ -1,0 +1,31 @@
+~/workspace$ python -m property_recommender.data_gathering.orchestrator
+INFO:__main__:Starting property-recommender orchestration...
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:Calling LLM for user-agent form generation...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:User-agent form generated and validated successfully.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/workspace/property_recommender/data_gathering/orchestrator.py", line 81, in <module>
+    main()
+  File "/home/runner/workspace/property_recommender/data_gathering/orchestrator.py", line 54, in main
+    endpoint, params, session = build_search_query(form)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/property_recommender/data_gathering/features/query_builder/query_builder.py", line 147, in build_search_query
+    params = build_params_from_form(form)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/property_recommender/data_gathering/features/query_builder/query_builder.py", line 64, in build_params_from_form
+    regions = get_regions()
+              ^^^^^^^^^^^^^
+  File "/home/runner/workspace/property_recommender/data_gathering/providers/trademe_api.py", line 114, in get_regions
+    return get_metadata("Regions", force_refresh)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/property_recommender/data_gathering/providers/trademe_api.py", line 106, in get_metadata
+    data = fetch_metadata_from_api(metadata_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/property_recommender/data_gathering/providers/trademe_api.py", line 83, in fetch_metadata_from_api
+    response.raise_for_status()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://api.tmsandbox.co.nz/v1/Metadata/Regions.json
+~/workspace$ 

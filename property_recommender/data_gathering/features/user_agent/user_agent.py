@@ -20,7 +20,9 @@ import json
 import logging
 from pathlib import Path
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 from jsonschema import validate, ValidationError
 
 from .prompts import build_user_agent_messages, SEARCH_SCHEMA
@@ -57,11 +59,9 @@ def run_user_agent(user_profile_path: Path, model: str = "gpt-4o") -> dict:
 
     # Call the OpenAI API
     logger.info("Calling LLM for user-agent form generation...")
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        temperature=0,
-    )
+    response = client.chat.completions.create(model=model,
+    messages=messages,
+    temperature=0)
     content = response.choices[0].message.content
 
     # Parse JSON

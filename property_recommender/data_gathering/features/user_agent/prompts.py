@@ -38,7 +38,7 @@ User Profile (raw JSON):
 {user_profile}
 
 Using the schema above, output a JSON object capturing the user's property search criteria.
-For location names, try use the names from the Trade Me metadata (regions, districts, suburbs).
+For location names, try use the names from the Trade Me metadata (regions, districts, suburbs). specially the specific formal suburb names for each city.
 Deliver **only** the JSON object, with no explanatory text.
 """
 

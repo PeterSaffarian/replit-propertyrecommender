@@ -153,9 +153,9 @@ def build_params_from_form(form: dict) -> Tuple[dict, dict]:
     # Populate params based on best match
     if suburb_obj:
         params["suburb"] = suburb_obj.get("SuburbId")
-    elif district_obj:
+    if district_obj:
         params["district"] = district_obj.get("DistrictId")
-    elif region_obj:
+    if region_obj:
         params["region"] = region_obj.get("LocalityId")
 
     # Numeric ranges

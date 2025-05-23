@@ -40,7 +40,7 @@ def confirm_location_mapping(match_hints: dict, model: str, temperature: float) 
 
     Args:
         match_hints: dict with keys 'region','district','suburb', each containing:
-                     {input: str, candidate: str, id: int}
+                     {input: str, candidate: str|None, id: int|None}
         model: OpenAI model name
         temperature: LLM temperature
     Returns:
@@ -54,14 +54,15 @@ def confirm_location_mapping(match_hints: dict, model: str, temperature: float) 
             f"{level.title()}: user input={hint.get('input')!r}, candidate={hint.get('candidate')!r}"  
         )
     system_prompt = (
-        "You are a metadata-mapping assistant. A user’s location has been interpreted as follows:\n"
-        + "\n".join(desc_lines)
-        + "\nPlease confirm whether this full mapping is correct for the user's intended location."
+        "You are a metadata-mapping assistant. A user’s location has been interpreted as follows:"
+        + ".join(desc_lines)"
+        + "Please confirm whether each of these mappings is correct."
     )
     user_prompt = (
-        "Respond ONLY in JSON. If the mapping is correct, output {\"approved\": true}. "
-        "If not, output {\"approved\": false, \"correction\": {\"region\": \"new-region\", "
-        "\"district\": \"new-district\", \"suburb\": \"new-suburb\"}}"
+        "Respond ONLY in JSON."
+        " If all mappings are correct, output {\"approved\": true}."
+        " If any mapping is missing or incorrect, output {\"approved\": false, \"correction\": {<level>: <best guess>, ...}}", 
+        # e.g.: {"approved": false, "correction": {"suburb": "Central City"}}
     )
     client = OpenAI()
     resp = client.chat.completions.create(
@@ -75,6 +76,8 @@ def confirm_location_mapping(match_hints: dict, model: str, temperature: float) 
     content = resp.choices[0].message.content
     try:
         return json.loads(content)
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON from confirmation LLM: {content}")
     except json.JSONDecodeError:
         raise ValueError(f"Invalid JSON from confirmation LLM: {content}")
 
@@ -102,10 +105,8 @@ def main():
     # Step 1: User Agent
     try:
         form = run_user_agent(profile_path)
-        save_path = project_root / "property_recommender" / "data_gathering" / "filled_form.json"
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        save_path.write_text(json.dumps(form, indent=2))
-        logger.info(f"Saved filled form to {save_path}")
+        (project_root / "data_gathering" / "filled_form.json").write_text(json.dumps(form, indent=2))
+        logger.info("Saved filled form to data_gathering/filled_form.json")
     except Exception as e:
         logger.error(f"User Agent failed: {e}")
         return
@@ -123,10 +124,10 @@ def main():
     # Step 2: Build initial query & hints
     try:
         endpoint, params, session, match_hints = build_search_query(form)
-        save_path = project_root / "property_recommender" / "data_gathering" / "search_query.json"
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        save_path.write_text(json.dumps({"endpoint": endpoint, "params": params}, indent=2))
-        logger.info(f"Saved initial search query to {save_path}")
+        (project_root / "data_gathering" / "search_query.json").write_text(
+            json.dumps({"endpoint": endpoint, "params": params}, indent=2)
+        )
+        logger.info("Saved initial search query to data_gathering/search_query.json")
     except ValueError as e:
         logger.error(f"Query building failed: {e}")
         return

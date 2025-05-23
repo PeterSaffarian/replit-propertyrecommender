@@ -20,8 +20,10 @@ import json
 import logging
 from pathlib import Path
 
-from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
+from openai import OpenAI
 client = OpenAI()
 from jsonschema import validate, ValidationError
 

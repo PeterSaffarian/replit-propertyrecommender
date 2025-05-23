@@ -44,6 +44,7 @@ VALIDATE_SEARCH_QUERY = """
 You are the user's representative. I will give you:
 1. The user's original filled_form JSON (what they wanted).
 2. The candidate search_query JSON (endpoint + params).
+3. Available suburbs for the district (if any).
 
 Task:
 - Verify that params contains "region", "district" and "suburb" IDs.
@@ -51,6 +52,8 @@ Task:
 - If everything is present and correct, reply with exactly:
   {"approved": true}
 
+- If suburb is missing or incorrect, suggest alternative suburb names from the available options.
+- For common areas like "Central", "City Centre", try variations like "Central City", "CBD", etc.
 - Otherwise, reply with exactly:
   {
     "approved": false,

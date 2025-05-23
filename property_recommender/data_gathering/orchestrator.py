@@ -84,7 +84,8 @@ def main():
 
             verdict = user_agent.validate_search_query(
                 form=form,
-                query={"endpoint": endpoint, "params": params}
+                query={"endpoint": endpoint, "params": params},
+                match_hints=match_hints
             )
 
             if verdict.get("approved"):

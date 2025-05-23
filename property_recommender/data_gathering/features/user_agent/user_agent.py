@@ -88,6 +88,7 @@ def run_user_agent(user_profile_path: Path, model: str = "gpt-4o") -> dict:
 def validate_search_query(
     form: dict,
     query: dict,
+    match_hints: dict = None,
     model: str = "gpt-4o",
     temperature: float = 0
 ) -> dict:
@@ -99,14 +100,20 @@ def validate_search_query(
 
     The LLM prompt is defined in VALIDATE_SEARCH_QUERY.
     """
+    content_parts = [
+        f"FORM: {json.dumps(form, indent=2)}",
+        f"QUERY: {json.dumps(query, indent=2)}"
+    ]
+    
+    if match_hints and match_hints.get("suburb", {}).get("options"):
+        suburb_options = match_hints["suburb"]["options"]
+        content_parts.append(f"AVAILABLE_SUBURBS: {json.dumps(suburb_options, indent=2)}")
+    
     messages = [
         {"role": "system", "content": VALIDATE_SEARCH_QUERY},
         {
             "role": "user",
-            "content": (
-                f"FORM: {json.dumps(form, indent=2)}\n"
-                f"QUERY: {json.dumps(query, indent=2)}"
-            )
+            "content": "\n\n".join(content_parts)
         }
     ]
 
@@ -129,8 +136,8 @@ def validate_search_query(
 
 # Expose a simple agent object for orchestrator
 class _UserAgentWrapper:
-    def validate_search_query(self, form: dict, query: dict) -> dict:
-        return validate_search_query(form, query)
+    def validate_search_query(self, form: dict, query: dict, match_hints: dict = None) -> dict:
+        return validate_search_query(form, query, match_hints)
 
 
 user_agent = _UserAgentWrapper()

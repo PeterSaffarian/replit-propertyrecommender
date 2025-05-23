@@ -89,7 +89,7 @@ def main(
     logger.info("Starting property-recommender orchestration...")
 
     # Resolve paths and project root
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).parent.parent.parent
     user_profile_path = Path(profile_path) if profile_path else project_root / "user_profile.json"
 
     # Load user profile

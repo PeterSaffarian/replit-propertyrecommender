@@ -167,7 +167,7 @@ def main():
         return
 
     # Step 5: Save raw data
-    out_path = Path(args.output) if args.output else Path(__file__).parent.parent / "raw_properties.json"
+    out_path = Path(args.output) if args.output else project_root / "raw_properties.json"
     out_path.write_text(json.dumps(raw_props, indent=2))
     logger.info(f"Saved {len(raw_props)} properties to {out_path}")
 

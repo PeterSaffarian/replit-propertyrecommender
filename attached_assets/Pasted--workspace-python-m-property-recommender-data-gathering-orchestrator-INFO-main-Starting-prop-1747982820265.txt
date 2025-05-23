@@ -1,0 +1,29 @@
+~/workspace$ python -m property_recommender.data_gathering.orchestrator
+INFO:__main__:Starting property-recommender orchestration...
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:Calling LLM for user-agent form generation...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:User-agent form generated and validated successfully.
+INFO:__main__:Saved filled form to /home/runner/workspace/property_recommender/data_gathering/filled_form.json
+INFO:property_recommender.data_gathering.features.query_builder.query_builder:Built query parameters: {'suburb': 2212, 'district': 60, 'region': 3, 'price_min': 500000, 'price_max': 1000000, 'bedrooms_min': 3, 'bathrooms_min': 2}
+INFO:__main__:Attempt 1: Built search query, saved to /home/runner/workspace/property_recommender/data_gathering/search_query.json
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:Calling LLM to validate search query...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:property_recommender.data_gathering.features.user_agent.user_agent:Invalid JSON from validate_search_query: Expecting value: line 1 column 1 (char 0)
+Content: ```json
+{"approved": true}
+```
+ERROR:__main__:Attempt 1: Query validation failed: Invalid JSON from validate_search_query: Expecting value: line 1 column 1 (char 0)
+INFO:property_recommender.data_gathering.features.query_builder.query_builder:Built query parameters: {'suburb': 2212, 'district': 60, 'region': 3, 'price_min': 500000, 'price_max': 1000000, 'bedrooms_min': 3, 'bathrooms_min': 2}
+INFO:__main__:Attempt 2: Built search query, saved to /home/runner/workspace/property_recommender/data_gathering/search_query.json
+INFO:property_recommender.data_gathering.features.user_agent.user_agent:Calling LLM to validate search query...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:property_recommender.data_gathering.features.user_agent.user_agent:Invalid JSON from validate_search_query: Expecting value: line 1 column 1 (char 0)
+Content: ```json
+{"approved": true}
+```
+ERROR:__main__:Attempt 2: Query validation failed: Invalid JSON from validate_search_query: Expecting value: line 1 column 1 (char 0)
+WARNING:__main__:Query not approved after 2 attempts; proceeding with last built query.
+INFO:property_recommender.data_gathering.features.fetch_executor.fetch_executor:Fetching page 1...
+INFO:property_recommender.data_gathering.features.fetch_executor.fetch_executor:First item complete response:
+ERROR:__main__:Fetching properties failed: name 'json' is not defined
+~/workspace$ 

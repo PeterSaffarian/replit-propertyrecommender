@@ -15,7 +15,7 @@ Raises:
 import logging
 from typing import Tuple, Union
 
-from data_gathering.providers.trademe_api import (
+from property_recommender.data_gathering.providers.trademe_api import (
     BASE_URL,
     get_oauth_session,
     get_regions,

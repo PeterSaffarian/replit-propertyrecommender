@@ -32,12 +32,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(profile_path=None, raw_output_path=None, clean_output_path=None, schema_path=None, model="gpt-4o", temperature=0.7, retries=2, sandbox=True):
     logger.info("Starting property-recommender orchestration...")
 
-    # Paths
-    project_root = Path(__file__).parent.parent
-    user_profile_path = project_root / "user_profile.json"
+    # Paths - use provided paths or defaults
+    if profile_path is None:
+        project_root = Path(__file__).parent.parent
+        user_profile_path = project_root / "user_profile.json"
+    else:
+        user_profile_path = profile_path
 
     # Step 1: User Agent (LLM)
     try:
@@ -61,9 +64,17 @@ def main():
         return
 
     # Step 4: Save results
-    output_path = project_root.parent / "raw_properties.json"
+    if raw_output_path is None:
+        project_root = Path(__file__).parent.parent
+        output_path = project_root.parent / "raw_properties.json"
+    else:
+        output_path = raw_output_path
+    
     output_path.write_text(json.dumps(raw_properties, indent=2))
     logger.info(f"Saved {len(raw_properties)} properties to {output_path}")
+    
+    # Note: clean_output_path, schema_path, model, temperature, retries are for future data cleaning step
+    # For now, just save the raw data
 
 
 if __name__ == "__main__":

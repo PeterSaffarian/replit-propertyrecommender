@@ -55,6 +55,11 @@ class Matcher:
             retry_limit:  Number of retries for LLM calls.
             api_key:      OpenAI API key or use OPENAI_API_KEY env var.
         """
+        # Load environment from project root .env
+        from dotenv import load_dotenv
+        env_path = Path(__file__).parents[3] / '.env'
+        load_dotenv(env_path)
+        
         # API key setup
         if api_key:
             self.api_key = api_key
@@ -62,7 +67,7 @@ class Matcher:
         elif os.getenv("OPENAI_API_KEY"):
             self.api_key = os.getenv("OPENAI_API_KEY")
         else:
-            raise ValueError("OpenAI API key must be provided or set in environment.")
+            raise ValueError(f"OpenAI API key must be provided or set in {env_path}")
 
         self.model = model
         self.temperature = temperature

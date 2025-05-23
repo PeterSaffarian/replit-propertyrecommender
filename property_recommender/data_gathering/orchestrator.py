@@ -125,10 +125,9 @@ def main():
     # Step 2: Build initial query & hints
     try:
         endpoint, params, session, match_hints = build_search_query(form)
-        (project_root / "data_gathering" / "search_query.json").write_text(
-            json.dumps({"endpoint": endpoint, "params": params}, indent=2)
-        )
-        logger.info("Saved initial search query to data_gathering/search_query.json")
+        save_path = Path(__file__).parent / "search_query.json"
+        save_path.write_text(json.dumps({"endpoint": endpoint, "params": params}, indent=2))
+        logger.info(f"Saved initial search query to {save_path}")
     except ValueError as e:
         logger.error(f"Query building failed: {e}")
         return

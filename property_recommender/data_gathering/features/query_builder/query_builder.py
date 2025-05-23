@@ -2,18 +2,19 @@
 property_recommender/data_gathering/features/query_builder/query_builder.py
 
 This module maps a structured search request form (from the LLM) to Trade Me API parameters,
-builds the search endpoint URL, and prepares an authenticated session.
+builds the search endpoint URL, and prepares an authenticated session, with fuzzy matching
+and metadata-mapping hints for LLM confirmation.
 
 Key functions:
-  - build_params_from_form(form: dict) -> dict
-  - build_search_query(form: dict) -> (endpoint: str, params: dict, session: OAuth1Session)
+  - build_params_from_form(form: dict) -> (params: dict, match_hints: dict)
+  - build_search_query(form: dict) -> (endpoint: str, params: dict, session: OAuth1Session, match_hints: dict)
 
 Raises:
   - ValueError on unmappable form values.
 """
 
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict, Any
 
 from property_recommender.data_gathering.providers.trademe_api import (
     BASE_URL,
@@ -30,92 +31,92 @@ logging.basicConfig(level=logging.INFO)
 SEARCH_PATH = "/Search/Property/Residential.json"
 
 
-def build_params_from_form(form: dict) -> dict:
+def fuzzy_match_item(name: str, items: list, name_key: str) -> Any:
     """
-    Convert the LLM form into Trade Me API query parameters.
+    Fuzzy-match a name against a list of items, using exact and substring matching.
+    Returns the first matching item or None.
+    """
+    target = name.lower().strip()
+    # Exact match
+    for item in items:
+        candidate = item.get(name_key, "")
+        if isinstance(candidate, str) and candidate.lower() == target:
+            return item
+    # Substring match
+    for item in items:
+        candidate = item.get(name_key, "").lower()
+        if target in candidate or candidate in target:
+            return item
+    return None
 
-    Args:
-        form: Dict matching search_request_form.json schema.
+
+def build_params_from_form(form: dict) -> Tuple[dict, dict]:
+    """
+    Convert the LLM form into Trade Me API query parameters and produce match hints.
+
     Returns:
-        params: Dict of query parameters for Trade Me.
+        params (dict): Query parameters for Trade Me.
+        match_hints (dict): Mapping details for region, district, and suburb.
 
     Raises:
-        ValueError: If a form value cannot be mapped to metadata.
+        ValueError: If a form value cannot be matched or mapped.
     """
-    params = {}
+    params: Dict[str, Any] = {}
+    match_hints: Dict[str, Dict[str, Any]] = {
+        "region":   {"input": form.get("region"),   "candidate": None, "id": None},
+        "district": {"input": form.get("district"), "candidate": None, "id": None},
+        "suburb":   {"input": form.get("suburb"),   "candidate": None, "id": None},
+    }
 
-    # Extract location fields
-    form_region = form.get("region")
+    form_region   = form.get("region")
     form_district = form.get("district")
-    form_suburb = form.get("suburb")
+    form_suburb   = form.get("suburb")
 
+    regions = get_regions()
     region_obj = None
     district_obj = None
     suburb_obj = None
 
-    regions = get_regions()
-
-    # 1) Try matching suburb first
+    # 1) Match suburb first
     if form_suburb:
         for r in regions:
             for d in r.get("Districts", []):
-                for s in d.get("Suburbs", []):
-                    if s.get("Name", "").lower() == form_suburb.lower():
-                        region_obj = r
-                        district_obj = d
-                        suburb_obj = s
-                        break
-                if suburb_obj:
+                candidate = fuzzy_match_item(form_suburb, d.get("Suburbs", []), "Name")
+                if candidate:
+                    region_obj = r
+                    district_obj = d
+                    suburb_obj = candidate
                     break
             if suburb_obj:
                 break
 
-    # 2) Try matching district
+    # 2) Match district
     if not suburb_obj and form_district:
         for r in regions:
-            for d in r.get("Districts", []):
-                if d.get("Name", "").lower() == form_district.lower():
-                    region_obj = r
-                    district_obj = d
-                    break
-            if district_obj:
+            candidate = fuzzy_match_item(form_district, r.get("Districts", []), "Name")
+            if candidate:
+                region_obj = r
+                district_obj = candidate
                 break
 
-    # 3) Try matching region
-    if not region_obj and form_region:
-        region_obj = next(
-            (r for r in regions if r.get("Name", "").lower() == form_region.lower()),
-            None
-        )
+    # 3) Match region
+    if not (region_obj or district_obj or suburb_obj) and form_region:
+        candidate = fuzzy_match_item(form_region, regions, "Name")
+        if candidate:
+            region_obj = candidate
 
-    # 4) Fallback: region field may contain district or suburb
-    if not region_obj and form_region:
-        # District fallback
-        for r in regions:
-            for d in r.get("Districts", []):
-                if d.get("Name", "").lower() == form_region.lower():
-                    region_obj = r
-                    district_obj = d
-                    break
-            if region_obj:
-                break
+    # Populate match_hints
+    if region_obj:
+        match_hints["region"]["candidate"] = region_obj.get("Name")
+        match_hints["region"]["id"] = region_obj.get("LocalityId")
+    if district_obj:
+        match_hints["district"]["candidate"] = district_obj.get("Name")
+        match_hints["district"]["id"] = district_obj.get("DistrictId")
+    if suburb_obj:
+        match_hints["suburb"]["candidate"] = suburb_obj.get("Name")
+        match_hints["suburb"]["id"] = suburb_obj.get("SuburbId")
 
-    if not region_obj and form_region:
-        # Suburb fallback
-        for r in regions:
-            for d in r.get("Districts", []):
-                for s in d.get("Suburbs", []):
-                    if s.get("Name", "").lower() == form_region.lower():
-                        region_obj = r
-                        district_obj = d
-                        suburb_obj = s
-                        break
-                if suburb_obj:
-                    break
-            if suburb_obj:
-                break
-
-    # Populate region/district/suburb parameters
+    # Populate params based on best match
     if suburb_obj:
         params["suburb"] = suburb_obj.get("SuburbId")
     elif district_obj:
@@ -124,28 +125,17 @@ def build_params_from_form(form: dict) -> dict:
         params["region"] = region_obj.get("LocalityId")
 
     # Numeric ranges
-    if form.get("min_price") is not None:
-        params["price_min"] = form["min_price"]
-    if form.get("max_price") is not None:
-        params["price_max"] = form["max_price"]
-    if form.get("min_bedrooms") is not None:
-        params["bedrooms_min"] = form["min_bedrooms"]
-    if form.get("max_bedrooms") is not None:
-        params["bedrooms_max"] = form["max_bedrooms"]
-    if form.get("min_bathrooms") is not None:
-        params["bathrooms_min"] = form["min_bathrooms"]
-    if form.get("max_bathrooms") is not None:
-        params["bathrooms_max"] = form["max_bathrooms"]
-    if form.get("min_carparks") is not None:
-        params["car_spaces_min"] = form["min_carparks"]
-    if form.get("max_carparks") is not None:
-        params["car_spaces_max"] = form["max_carparks"]
+    numeric_map = [
+        ("min_price", "price_min"), ("max_price", "price_max"),
+        ("min_bedrooms", "bedrooms_min"), ("max_bedrooms", "bedrooms_max"),
+        ("min_bathrooms", "bathrooms_min"), ("max_bathrooms", "bathrooms_max"),
+        ("min_carparks", "car_spaces_min"), ("max_carparks", "car_spaces_max"),
+    ]
+    for form_key, param_key in numeric_map:
+        if form.get(form_key) is not None:
+            params[param_key] = form.get(form_key)
 
-    # Adjacent suburbs if suburb was specified
-    if suburb_obj and form.get("adjacent_suburbs"):
-        params["adjacent_suburbs"] = True
-
-    # Property type(s)
+    # Property types
     types = form.get("property_types")
     if types:
         vals = types if isinstance(types, list) else [types]
@@ -163,7 +153,7 @@ def build_params_from_form(form: dict) -> dict:
                     raise ValueError(f"Unknown property_type: {v}")
         params["property_type"] = ",".join(selected)
 
-    # Sales method(s)
+    # Sales methods
     methods = form.get("sales_methods")
     if methods:
         vals = methods if isinstance(methods, list) else [methods]
@@ -182,19 +172,19 @@ def build_params_from_form(form: dict) -> dict:
         params["sales_method"] = ",".join(selected)
 
     logger.info(f"Built query parameters: {params}")
-    return params
+    return params, match_hints
 
 
-def build_search_query(form: dict) -> Tuple[str, dict, Union['OAuth1Session', None]]:
+def build_search_query(
+    form: dict
+) -> Tuple[str, dict, Union['OAuth1Session', None], dict]:
     """
-    Build the full search endpoint, parameters, and authenticated session.
+    Build the full search endpoint, parameters, session, and mapping hints.
 
-    Args:
-        form: Dict matching search_request_form.json schema.
     Returns:
-        endpoint (str), params (dict), session (OAuth1Session).
+        endpoint (str), params (dict), session (OAuth1Session), match_hints (dict)
     """
     session = get_oauth_session()
     endpoint = f"{BASE_URL}{SEARCH_PATH}"
-    params = build_params_from_form(form)
-    return endpoint, params, session
+    params, match_hints = build_params_from_form(form)
+    return endpoint, params, session, match_hints

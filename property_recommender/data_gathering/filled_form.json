@@ -1,0 +1,8 @@
+{
+  "district": "Christchurch",
+  "suburb": "City Centre",
+  "min_price": 500000,
+  "max_price": 700000,
+  "min_bedrooms": 3,
+  "min_bathrooms": 2
+}

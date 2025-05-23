@@ -3,44 +3,44 @@ property_recommender/data_gathering/features/user_agent/prompts.py
 
 This module defines the system and user prompts for the LLM-based "User Agent" feature.
 The LLM will consume a user profile and a JSON schema (search_request_form.json) and output
-only a JSON object conforming to that schema, representing the user's property search preferences.
+strictly a JSON object conforming to that schema, representing the user's property search preferences.
 """
 import json
 from pathlib import Path
 
-# Path to the JSON schema that the LLM must fill
+# Load the JSON schema the LLM must adhere to
 SCHEMA_FILE = Path(__file__).parent.parent.parent / 'schemas' / 'search_request_form.json'
 SEARCH_SCHEMA = json.loads(SCHEMA_FILE.read_text())
 
-# System prompt instructing the LLM on its role and the schema
+# System prompt: define the agent's role and rules
 SYSTEM_PROMPT = f"""
-You are a property search assistant. Your task is to translate a user's real estate preferences
-into a structured JSON object that strictly adheres to the provided JSON schema.
+You are the user's dedicated property search assistant. Act as the user's proxy: interpret their
+real estate preferences, make reasonable decisions or educated guesses when details are missing,
+and produce exactly one JSON object that follows the provided schema.
 
 Rules:
-- Only output valid JSON that matches the schema (no extra keys).
-- All fields are optional; include only those preferences expressed by the user.
-- Do not wrap the JSON in markdown or code fences.
+- You have the authority to decide or infer missing information based on the user's profile.
+- You must include at least one location field: "region", "district", or "suburb". If the profile
+  mentions a city, map it to "district". If uncertain, default the value into "district".
+- Only output valid JSON matching the schema below; do not add extra keys or wrap output in
+  markdown or code fences.
+- All fields are optional; include only those clearly implied by the user's profile.
 
-Here is the JSON schema (draft-07):
+JSON Schema (draft-07):
 ```json
 {json.dumps(SEARCH_SCHEMA, indent=2)}
 ```
 """
 
-# Template for the user prompt that supplies the user's profile
+# User prompt: supply the user's raw profile
 USER_PROMPT_TEMPLATE = """
 User Profile (raw JSON):
-```
 {user_profile}
-```
 
-Using the schema above, fill out a JSON object capturing the user's search criteria
-(e.g., location, price_range, bedroom_range, etc.).
-
-Deliver ONLY the JSON object. Do NOT add any explanatory text.
+Using the schema above, output a JSON object capturing the user's property search criteria.
+For location names, try use the names from the Trade Me metadata (regions, districts, suburbs).
+Deliver **only** the JSON object, with no explanatory text.
 """
-
 
 def build_user_agent_messages(user_profile: str) -> list:
     """
@@ -50,9 +50,9 @@ def build_user_agent_messages(user_profile: str) -> list:
         user_profile: JSON string of the user's profile.
 
     Returns:
-        List of message dicts for roles 'system' and 'user'.
+        List of messages with 'system' and 'user' roles.
     """
     return [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": USER_PROMPT_TEMPLATE.format(user_profile=user_profile)},
+        {"role": "user",   "content": USER_PROMPT_TEMPLATE.format(user_profile=user_profile)},
     ]

@@ -4,22 +4,80 @@
     "Title": "Blessings on the bay",
     "Category": "0350-5748-3399-",
     "StartPrice": 0,
-    "StartDate": "/Date(1585704246087)/",
+    "StartDate": "/Date(1585700646087)/",
     "EndDate": "/Date(1753920006617)/",
     "ListingLength": null,
     "IsFeatured": true,
     "HasGallery": true,
     "IsBold": true,
     "IsHighlighted": true,
-    "AsAt": "/Date(1747983011464)/",
+    "AsAt": "/Date(1747984006459)/",
     "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
-    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756864.jpg",
-    "RegionId": 3,
+    "PhotoId": 4756864,
+    "RegionId": 16,
     "Region": "Canterbury",
-    "SuburbId": 2212,
-    "Suburb": "City Centre",
+    "SuburbId": 86,
+    "Suburb": "Christchurch City",
+    "ViewCount": 494,
     "NoteDate": "/Date(0)/",
+    "CategoryName": "For Sale",
     "ReserveState": 3,
+    "Attributes": [
+      {
+        "Name": "bedrooms",
+        "DisplayName": "Bedrooms",
+        "Value": "5 bedrooms",
+        "EncodedValue": "5bedrooms"
+      },
+      {
+        "Name": "bathrooms",
+        "DisplayName": "Bathrooms",
+        "Value": "5 bathrooms",
+        "EncodedValue": "5bathrooms"
+      },
+      {
+        "Name": "property_type",
+        "DisplayName": "Property type",
+        "Value": "House",
+        "EncodedValue": "House"
+      },
+      {
+        "Name": "price",
+        "DisplayName": "Price",
+        "Value": "Asking price $555,000",
+        "EncodedValue": "Askingprice$555,000"
+      },
+      {
+        "Name": "location",
+        "DisplayName": "Location",
+        "Value": "12 Ilam road, City Centre, Christchurch City, Canterbury"
+      },
+      {
+        "Name": "district",
+        "DisplayName": "District",
+        "Value": "Christchurch City"
+      },
+      {
+        "Name": "region",
+        "DisplayName": "Region",
+        "Value": "Canterbury"
+      },
+      {
+        "Name": "suburb",
+        "DisplayName": "Suburb",
+        "Value": "City Centre"
+      },
+      {
+        "Name": "agency_reference",
+        "DisplayName": "Agency reference",
+        "Value": "HIL2258"
+      },
+      {
+        "Name": "apply_online",
+        "DisplayName": "Apply Online",
+        "Value": "http://www.tmsandbox.co.nz/Browse/Jobs/ApplyOnline.aspx?mode=apply_online&referenceId=2148747178&sellerId=0"
+      }
+    ],
     "IsClassified": true,
     "OpenHomes": [],
     "GeographicLocation": {
@@ -30,45 +88,100 @@
       "Accuracy": 1
     },
     "PriceDisplay": "Asking price $555,000",
-    "PhotoUrls": [
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756865.jpg",
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756866.jpg",
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756867.jpg",
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756868.jpg"
-    ],
     "AdditionalData": {
       "BulletPoints": [],
       "Tags": []
     },
-    "MemberId": 4001313,
     "ListingPlatform": 1,
-    "Address": "12 Ilam road",
-    "District": "Christchurch City",
-    "AgencyReference": "HIL2258",
-    "Bathrooms": 5,
-    "Bedrooms": 5,
-    "ListingGroup": "PROPERTY",
-    "Parking": "",
-    "PropertyType": "House",
-    "AdjacentSuburbNames": [
-      "City Centre",
-      "Richmond",
-      "St. Albans",
-      "Phillipstown",
-      "Edgeware",
-      "Linwood",
-      "Sydenham"
+    "AllowsPickups": 1,
+    "Member": {
+      "MemberId": 4001313,
+      "Nickname": "tmdeveloper",
+      "DateAddressVerified": "/Date(1392289200000)/",
+      "DateJoined": "/Date(1392289200000)/",
+      "UniqueNegative": 0,
+      "UniquePositive": 0,
+      "FeedbackCount": 0,
+      "IsAddressVerified": true,
+      "Suburb": "Christchurch City",
+      "Region": "Canterbury",
+      "IsAuthenticated": true
+    },
+    "Body": "Blessings on the bay",
+    "Photos": [
+      {
+        "Key": 4756864,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756864.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4756864.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4756864.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4756864.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4756864.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4756864.jpg",
+          "PhotoId": 4756864,
+          "OriginalWidth": 512,
+          "OriginalHeight": 768
+        }
+      },
+      {
+        "Key": 4756865,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756865.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4756865.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4756865.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4756865.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4756865.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4756865.jpg",
+          "PhotoId": 4756865,
+          "OriginalWidth": 1024,
+          "OriginalHeight": 683
+        }
+      },
+      {
+        "Key": 4756866,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756866.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4756866.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4756866.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4756866.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4756866.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4756866.jpg",
+          "PhotoId": 4756866,
+          "OriginalWidth": 1300,
+          "OriginalHeight": 866
+        }
+      },
+      {
+        "Key": 4756867,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756867.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4756867.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4756867.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4756867.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4756867.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4756867.jpg",
+          "PhotoId": 4756867,
+          "OriginalWidth": 1300,
+          "OriginalHeight": 866
+        }
+      },
+      {
+        "Key": 4756868,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4756868.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4756868.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4756868.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4756868.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4756868.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4756868.jpg",
+          "PhotoId": 4756868,
+          "OriginalWidth": 512,
+          "OriginalHeight": 768
+        }
+      }
     ],
-    "AdjacentSuburbIds": [
-      2212,
-      2213,
-      2214,
-      2216,
-      3345,
-      2238,
-      2180
-    ],
-    "DistrictId": 60,
+    "ShippingOptions": [],
+    "PaymentOptions": "",
     "Agency": {
       "Id": 22,
       "Name": "Harcourts",
@@ -90,10 +203,42 @@
       ],
       "IsRealEstateAgency": true
     },
+    "CanAddToCart": false,
+    "EmbeddedContent": {},
+    "SupportsQuestionsAndAnswers": false,
+    "SuppressComplementaryListings": true,
+    "PaymentMethods": [
+      {
+        "Id": 16,
+        "Name": ""
+      }
+    ],
+    "BoundaryImage": {
+      "Thumbnail": null,
+      "List": null,
+      "Medium": null,
+      "Gallery": null,
+      "Large": null,
+      "FullSize": null,
+      "PhotoId": 0
+    },
+    "RenderOptions": [],
+    "AreaOfBusiness": 2,
+    "Office": {
+      "MembershipType": 3,
+      "HeroImages": {
+        "Original": "https://trademe.sandbox.tmcdn.co.nz/property/office_profile/hero_images/4001313-1.png",
+        "Small": "https://trademe.sandbox.tmcdn.co.nz/property/office_profile/hero_images/small/4001313-1.png"
+      },
+      "IsPartnerAccreditationEnabled": true
+    },
+    "IsExtendable": true,
+    "IsAutoExtended": true,
     "PropertySaleInformation": {
       "PropertySaleType": 1,
       "PropertyDateOfSale": "/Date(1753920006617)/"
-    }
+    },
+    "CanRelistUsingKoru": false
   },
   {
     "ListingId": 6625386,
@@ -104,15 +249,73 @@
     "EndDate": "/Date(1753825838800)/",
     "ListingLength": null,
     "HasGallery": true,
-    "AsAt": "/Date(1747983011467)/",
+    "AsAt": "/Date(1747984007217)/",
     "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
-    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146876.jpg",
-    "RegionId": 3,
+    "PhotoId": 4146876,
+    "RegionId": 16,
     "Region": "Canterbury",
-    "SuburbId": 2212,
-    "Suburb": "City Centre",
+    "SuburbId": 86,
+    "Suburb": "Christchurch City",
+    "ViewCount": 912,
     "NoteDate": "/Date(0)/",
+    "CategoryName": "For Sale",
     "ReserveState": 3,
+    "Attributes": [
+      {
+        "Name": "bedrooms",
+        "DisplayName": "Bedrooms",
+        "Value": "6 or more bedrooms",
+        "EncodedValue": "6ormorebedrooms"
+      },
+      {
+        "Name": "bathrooms",
+        "DisplayName": "Bathrooms",
+        "Value": "2 bathrooms",
+        "EncodedValue": "2bathrooms"
+      },
+      {
+        "Name": "property_type",
+        "DisplayName": "Property type",
+        "Value": "House",
+        "EncodedValue": "House"
+      },
+      {
+        "Name": "price",
+        "DisplayName": "Price",
+        "Value": "Asking price $989,007",
+        "EncodedValue": "Askingprice$989,007"
+      },
+      {
+        "Name": "location",
+        "DisplayName": "Location",
+        "Value": "222 PAPANUI Road, City Centre, Christchurch City, Canterbury"
+      },
+      {
+        "Name": "district",
+        "DisplayName": "District",
+        "Value": "Christchurch City"
+      },
+      {
+        "Name": "region",
+        "DisplayName": "Region",
+        "Value": "Canterbury"
+      },
+      {
+        "Name": "suburb",
+        "DisplayName": "Suburb",
+        "Value": "City Centre"
+      },
+      {
+        "Name": "agency_reference",
+        "DisplayName": "Agency reference",
+        "Value": "PI52382"
+      },
+      {
+        "Name": "apply_online",
+        "DisplayName": "Apply Online",
+        "Value": "http://www.tmsandbox.co.nz/Browse/Jobs/ApplyOnline.aspx?mode=apply_online&referenceId=6625386&sellerId=0"
+      }
+    ],
     "IsClassified": true,
     "OpenHomes": [],
     "GeographicLocation": {
@@ -123,44 +326,86 @@
       "Accuracy": 3
     },
     "PriceDisplay": "Asking price $989,007",
-    "PhotoUrls": [
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146877.jpg",
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146878.jpg",
-      "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146879.jpg"
-    ],
     "AdditionalData": {
       "BulletPoints": [],
       "Tags": []
     },
-    "MemberId": 4001313,
     "ListingPlatform": 1,
-    "Address": "222 PAPANUI Road",
-    "District": "Christchurch City",
-    "AgencyReference": "PI52382",
-    "Bathrooms": 2,
-    "Bedrooms": 6,
-    "ListingGroup": "PROPERTY",
-    "Parking": "",
-    "PropertyType": "House",
-    "AdjacentSuburbNames": [
-      "City Centre",
-      "Richmond",
-      "St. Albans",
-      "Phillipstown",
-      "Edgeware",
-      "Linwood",
-      "Sydenham"
+    "AllowsPickups": 1,
+    "Member": {
+      "MemberId": 4001313,
+      "Nickname": "tmdeveloper",
+      "DateAddressVerified": "/Date(1392289200000)/",
+      "DateJoined": "/Date(1392289200000)/",
+      "UniqueNegative": 0,
+      "UniquePositive": 0,
+      "FeedbackCount": 0,
+      "IsAddressVerified": true,
+      "Suburb": "Christchurch City",
+      "Region": "Canterbury",
+      "IsAuthenticated": true
+    },
+    "Body": "House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale..House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale..House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale..House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.House for sale.",
+    "Photos": [
+      {
+        "Key": 4146876,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146876.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4146876.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4146876.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4146876.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4146876.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4146876.jpg",
+          "PhotoId": 4146876,
+          "OriginalWidth": 1024,
+          "OriginalHeight": 683
+        }
+      },
+      {
+        "Key": 4146877,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146877.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4146877.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4146877.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4146877.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4146877.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4146877.jpg",
+          "PhotoId": 4146877,
+          "OriginalWidth": 1024,
+          "OriginalHeight": 683
+        }
+      },
+      {
+        "Key": 4146878,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146878.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4146878.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4146878.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4146878.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4146878.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4146878.jpg",
+          "PhotoId": 4146878,
+          "OriginalWidth": 1024,
+          "OriginalHeight": 683
+        }
+      },
+      {
+        "Key": 4146879,
+        "Value": {
+          "Thumbnail": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/4146879.jpg",
+          "List": "https://trademe.sandbox.tmcdn.co.nz/photoserver/lv2/4146879.jpg",
+          "Medium": "https://trademe.sandbox.tmcdn.co.nz/photoserver/med/4146879.jpg",
+          "Gallery": "https://trademe.sandbox.tmcdn.co.nz/photoserver/gv/4146879.jpg",
+          "Large": "https://trademe.sandbox.tmcdn.co.nz/photoserver/tq/4146879.jpg",
+          "FullSize": "https://trademe.sandbox.tmcdn.co.nz/photoserver/full/4146879.jpg",
+          "PhotoId": 4146879,
+          "OriginalWidth": 1024,
+          "OriginalHeight": 683
+        }
+      }
     ],
-    "AdjacentSuburbIds": [
-      2212,
-      2213,
-      2214,
-      2216,
-      3345,
-      2238,
-      2180
-    ],
-    "DistrictId": 60,
+    "ShippingOptions": [],
+    "PaymentOptions": "",
     "Agency": {
       "Id": 22,
       "Name": "Harcourts",
@@ -183,9 +428,41 @@
       ],
       "IsRealEstateAgency": true
     },
+    "CanAddToCart": false,
+    "EmbeddedContent": {},
+    "SupportsQuestionsAndAnswers": false,
+    "SuppressComplementaryListings": true,
+    "PaymentMethods": [
+      {
+        "Id": 16,
+        "Name": ""
+      }
+    ],
+    "BoundaryImage": {
+      "Thumbnail": null,
+      "List": null,
+      "Medium": null,
+      "Gallery": null,
+      "Large": null,
+      "FullSize": null,
+      "PhotoId": 0
+    },
+    "RenderOptions": [],
+    "AreaOfBusiness": 2,
+    "Office": {
+      "MembershipType": 3,
+      "HeroImages": {
+        "Original": "https://trademe.sandbox.tmcdn.co.nz/property/office_profile/hero_images/4001313-1.png",
+        "Small": "https://trademe.sandbox.tmcdn.co.nz/property/office_profile/hero_images/small/4001313-1.png"
+      },
+      "IsPartnerAccreditationEnabled": true
+    },
+    "IsExtendable": true,
+    "IsAutoExtended": true,
     "PropertySaleInformation": {
       "PropertySaleType": 1,
       "PropertyDateOfSale": "/Date(1753825838800)/"
-    }
+    },
+    "CanRelistUsingKoru": false
   }
 ]

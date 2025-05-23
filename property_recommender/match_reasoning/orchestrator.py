@@ -73,8 +73,8 @@ def main():
         help="Path to the normalized user profile JSON"
     )
     parser.add_argument(
-        "--listings", type=Path, default=Path("clean_properties.json"),
-        help="Path to the cleaned property listings JSON"
+        "--listings", type=Path, default=Path("raw_properties.json"),
+        help="Path to the raw property listings JSON"
     )
     parser.add_argument(
         "--out", type=Path, default=Path("property_matches.json"),

@@ -83,6 +83,10 @@ def fetch_raw_properties(
         data = response.json()
         items = data.get('List', [])
         count = len(items)
+        # Log complete first item to see all available fields
+        if page == 1 and items:
+            logger.info("First item complete response:")
+            logger.info(json.dumps(items[0], indent=2))
         logger.info(f"Page {page} fetched: {count} items.")
 
         all_items.extend(items)

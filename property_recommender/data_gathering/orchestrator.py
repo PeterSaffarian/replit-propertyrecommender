@@ -105,8 +105,9 @@ def main():
     # Step 1: User Agent
     try:
         form = run_user_agent(profile_path)
-        (project_root / "data_gathering" / "filled_form.json").write_text(json.dumps(form, indent=2))
-        logger.info("Saved filled form to data_gathering/filled_form.json")
+        save_path = Path(__file__).parent / "filled_form.json"
+        save_path.write_text(json.dumps(form, indent=2))
+        logger.info(f"Saved filled form to {save_path}")
     except Exception as e:
         logger.error(f"User Agent failed: {e}")
         return

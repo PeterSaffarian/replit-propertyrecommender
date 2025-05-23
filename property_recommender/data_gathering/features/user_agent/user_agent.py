@@ -47,7 +47,7 @@ def run_user_agent(user_profile_path: Path, model: str = "gpt-4o") -> dict:
     """
     # Load user profile
     try:
-        user_profile = json.loads(user_profile_path.read_text())
+        user_profile = json.loads(Path("user_profile.json").read_text())
     except Exception as e:
         logger.error(f"Failed to load user profile: {e}")
         raise

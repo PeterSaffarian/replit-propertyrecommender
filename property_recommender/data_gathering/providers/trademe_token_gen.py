@@ -30,7 +30,7 @@ ACCESS_TOKEN_URL     = "https://api.tmsandbox.co.nz/Oauth/AccessToken"
 
 def main():
     # 1. Load .env
-    dotenv_path = find_dotenv()
+    dotenv_path = find_dotenv(usecwd=True)
     if not dotenv_path:
         print("❌ Could not find a .env file. Create one from .env.example first.")
         sys.exit(1)

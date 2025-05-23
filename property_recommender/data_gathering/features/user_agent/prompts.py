@@ -5,6 +5,7 @@ This module defines the system and user prompts for the LLM-based "User Agent" f
 The LLM will consume a user profile and a JSON schema (search_request_form.json) and output
 strictly a JSON object conforming to that schema, representing the user's property search preferences.
 """
+
 import json
 from pathlib import Path
 
@@ -12,7 +13,6 @@ from pathlib import Path
 SCHEMA_FILE = Path(__file__).parent.parent.parent / 'schemas' / 'search_request_form.json'
 SEARCH_SCHEMA = json.loads(SCHEMA_FILE.read_text())
 
-# System prompt: define the agent's role and rules
 SYSTEM_PROMPT = f"""
 You are the user's dedicated property search assistant. Act as the user's proxy: interpret their
 real estate preferences, make reasonable decisions or educated guesses when details are missing,
@@ -27,20 +27,41 @@ Rules:
 - All fields are optional; include only those clearly implied by the user's profile.
 
 JSON Schema (draft-07):
-```json
 {json.dumps(SEARCH_SCHEMA, indent=2)}
-```
 """
 
-# User prompt: supply the user's raw profile
 USER_PROMPT_TEMPLATE = """
 User Profile (raw JSON):
 {user_profile}
 
 Using the schema above, output a JSON object capturing the user's property search criteria.
-For location names, try use the names from the Trade Me metadata (regions, districts, suburbs). specially the specific formal suburb names for each city.
-Deliver **only** the JSON object, with no explanatory text.
+For location names, try to use the names from the Trade Me metadata (regions, districts, suburbs),
+especially the specific formal suburb names for each city.
+Deliver only the JSON object, with no explanatory text.
 """
+
+VALIDATE_SEARCH_QUERY = """
+You are the user's representative. I will give you:
+1. The user's original filled_form JSON (what they wanted).
+2. The candidate search_query JSON (endpoint + params).
+
+Task:
+- Verify that params contains "region", "district" and "suburb" IDs.
+- Ensure those IDs correctly match the names in the form.
+- If everything is present and correct, reply with exactly:
+  {"approved": true}
+
+- Otherwise, reply with exactly:
+  {
+    "approved": false,
+    "suggestions": {
+      "<field>": "<new value to retry>"
+    }
+  }
+
+Your response must be pure JSON, no extra text.
+"""
+
 
 def build_user_agent_messages(user_profile: str) -> list:
     """

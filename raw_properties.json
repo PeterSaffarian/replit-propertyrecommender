@@ -1,0 +1,566 @@
+[
+  {
+    "ListingId": 2149429213,
+    "Title": "Wowx",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1655936661393)/",
+    "EndDate": "/Date(1754874523540)/",
+    "ListingLength": null,
+    "IsFeatured": true,
+    "HasGallery": true,
+    "IsBold": true,
+    "IsHighlighted": true,
+    "AsAt": "/Date(1747977560014)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/11745230.jpg",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.4837685,
+      "Longitude": 172.6423094,
+      "Northing": 5185399,
+      "Easting": 1571075,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Auction on 3 Sep, 2:00pm",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "Unit 2/689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 5,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Apartment",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Marc Fibbens",
+          "MobilePhoneNumber": "(027) 2742746",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        },
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Wendy Waltenberg",
+          "MobilePhoneNumber": "(027) 2742746",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 3,
+      "PropertyDateOfSale": "/Date(1756864800000)/"
+    }
+  },
+  {
+    "ListingId": 2149429212,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1655936550037)/",
+    "EndDate": "/Date(1754086950037)/",
+    "ListingLength": null,
+    "IsFeatured": true,
+    "HasGallery": true,
+    "IsBold": true,
+    "IsHighlighted": true,
+    "AsAt": "/Date(1747977560020)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/11745230.jpg",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.4837685,
+      "Longitude": 172.6423094,
+      "Northing": 5185399,
+      "Easting": 1571075,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Auction on 9 Nov, 2:00pm",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "Unit 2/689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 5,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Apartment",
+    "PropertyId": "ABZ965",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 3,
+      "PropertyDateOfSale": "/Date(1762650000000)/"
+    }
+  },
+  {
+    "ListingId": 2149421465,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1653369432560)/",
+    "EndDate": "/Date(1751519832560)/",
+    "ListingLength": null,
+    "IsFeatured": true,
+    "HasGallery": true,
+    "IsBold": true,
+    "IsHighlighted": true,
+    "AsAt": "/Date(1747977560023)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/11745230.jpg",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.4837685,
+      "Longitude": 172.6423094,
+      "Northing": 5185399,
+      "Easting": 1571075,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Auction on 9 Nov, 2:00pm",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "Unit 2/689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 5,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Apartment",
+    "PropertyId": "ABY841",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 3,
+      "PropertyDateOfSale": "/Date(1762650000000)/"
+    }
+  },
+  {
+    "ListingId": 2149421464,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1653369281797)/",
+    "EndDate": "/Date(1751519740567)/",
+    "ListingLength": null,
+    "IsFeatured": true,
+    "HasGallery": true,
+    "IsBold": true,
+    "IsHighlighted": true,
+    "AsAt": "/Date(1747977560023)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/11745202.jpg",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.4837685,
+      "Longitude": 172.6423094,
+      "Northing": 5185399,
+      "Easting": 1571075,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Auction on 9 Nov, 2:00pm",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "Unit 2/689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 5,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Apartment",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 3,
+      "PropertyDateOfSale": "/Date(1762650000000)/"
+    }
+  },
+  {
+    "ListingId": 2149113401,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1597616521227)/",
+    "EndDate": "/Date(1751495292820)/",
+    "ListingLength": null,
+    "HasGallery": true,
+    "AsAt": "/Date(1747977560025)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "PictureHref": "https://trademe.sandbox.tmcdn.co.nz/photoserver/thumb/8461664.jpg",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.4837685,
+      "Longitude": 172.6423094,
+      "Northing": 5185399,
+      "Easting": 1571075,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Auction on 9 Nov, 2:00pm",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "Unit 2/689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 5,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Apartment",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 3,
+      "PropertyDateOfSale": "/Date(1762650000000)/"
+    }
+  },
+  {
+    "ListingId": 2149113400,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1597616485413)/",
+    "EndDate": "/Date(1750198885413)/",
+    "ListingLength": null,
+    "AsAt": "/Date(1747977560025)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.483741,
+      "Longitude": 172.642301,
+      "Northing": 5185402,
+      "Easting": 1571074,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Price by negotiation",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 4,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Unit",
+    "PropertyId": "ABL111",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 5,
+      "PropertyDateOfSale": "/Date(1750198885413)/"
+    }
+  },
+  {
+    "ListingId": 2149113389,
+    "Title": "Wow",
+    "Category": "0350-5748-3399-",
+    "StartPrice": 0,
+    "StartDate": "/Date(1597615455293)/",
+    "EndDate": "/Date(1750198761037)/",
+    "ListingLength": null,
+    "AsAt": "/Date(1747977560030)/",
+    "CategoryPath": "/Trade-Me-Property/Residential/For-Sale",
+    "RegionId": 3,
+    "Region": "Canterbury",
+    "SuburbId": 2042,
+    "Suburb": "Marshland",
+    "NoteDate": "/Date(0)/",
+    "ReserveState": 3,
+    "IsClassified": true,
+    "OpenHomes": [],
+    "GeographicLocation": {
+      "Latitude": -43.483741,
+      "Longitude": 172.642301,
+      "Northing": 5185402,
+      "Easting": 1571074,
+      "Accuracy": 1
+    },
+    "PriceDisplay": "Price by negotiation",
+    "PhotoUrls": [],
+    "AdditionalData": {
+      "BulletPoints": [],
+      "Tags": []
+    },
+    "MemberId": 4004638,
+    "ListingPlatform": 1,
+    "Address": "689 Hills Road",
+    "District": "Christchurch City",
+    "AgencyReference": "TRC18894",
+    "Bathrooms": 3,
+    "Bedrooms": 6,
+    "ListingGroup": "PROPERTY",
+    "Parking": "Not Specified",
+    "PropertyType": "Unit",
+    "AdjacentSuburbNames": [
+      "Marshland",
+      "Redwood"
+    ],
+    "AdjacentSuburbIds": [
+      2042,
+      2511
+    ],
+    "DistrictId": 60,
+    "Agency": {
+      "Id": 92,
+      "Name": "Total Realty",
+      "Branding": {
+        "BackgroundColor": "",
+        "TextColor": "",
+        "StrokeColor": "",
+        "OfficeLocation": "",
+        "LargeBannerURL": ""
+      },
+      "Agents": [
+        {
+          "__type": "PropertyAgent:http://api.trademe.co.nz/v1",
+          "FullName": "Ray Beattie",
+          "MobilePhoneNumber": "(027) 4373932",
+          "OfficePhoneNumber": "(03) 9409797",
+          "MembershipType": 0
+        }
+      ],
+      "IsRealEstateAgency": true
+    },
+    "PropertySaleInformation": {
+      "PropertySaleType": 5,
+      "PropertyDateOfSale": "/Date(1750198761037)/"
+    }
+  }
+]

@@ -46,6 +46,8 @@ SEARCH_PATH = "/search/property/residential.json"
 # OAuth1 credentials (from .env)
 CONSUMER_KEY = os.getenv("TRADEME_CONSUMER_KEY")
 CONSUMER_SECRET = os.getenv("TRADEME_CONSUMER_SECRET")
+OAUTH_TOKEN = os.getenv("TRADEME_OAUTH_TOKEN")
+OAUTH_TOKEN_SECRET = os.getenv("TRADEME_OAUTH_TOKEN_SECRET")
 
 # Metadata cache file path
 METADATA_CACHE_FILE = Path(__file__).parent / "trademe_metadata.json"
@@ -62,9 +64,15 @@ def get_oauth_session() -> OAuth1Session:
         raise EnvironmentError(
             "Missing Trade Me consumer key/secret. Check your .env file."
         )
+    if not OAUTH_TOKEN or not OAUTH_TOKEN_SECRET:
+        raise EnvironmentError(
+            "Missing Trade Me OAuth tokens. Run trademe_token_gen.py to generate them."
+        )
     return OAuth1Session(
         client_key=CONSUMER_KEY,
         client_secret=CONSUMER_SECRET,
+        resource_owner_key=OAUTH_TOKEN,
+        resource_owner_secret=OAUTH_TOKEN_SECRET,
     )
 
 
@@ -85,9 +93,9 @@ def fetch_metadata_from_api(metadata_type: str) -> dict:
     elif key == "suburbs":
         url = f"{BASE_URL}/Localities/Suburbs.json"
     elif key == "propertytypes":
-        url = f"{BASE_URL}/Metadata/PropertyTypes.json"
+        url = f"{BASE_URL}/Categories.json"  # Use Categories endpoint instead
     elif key == "salesmethods":
-        url = f"{BASE_URL}/Metadata/SalesMethods.json"
+        url = f"{BASE_URL}/Categories.json"  # Use Categories endpoint for now
     else:
         raise ValueError(f"Unknown metadata type: {metadata_type!r}")
 

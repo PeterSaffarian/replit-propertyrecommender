@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "property_id": 2148747178,
+    "score": 0.95,
+    "rationale": "This property is located in the desired city center of Christchurch, has 5 bedrooms and 5 bathrooms exceeding the minimum requirements, and is within the price range at $555,000."
+  },
+  {
+    "property_id": 6625386,
+    "score": 0.85,
+    "rationale": "Located in the city center, this property has 6+ bedrooms and 2 bathrooms, meeting the minimum requirements. The price of $989,007 is at the upper limit of the budget."
+  }
+]

@@ -106,9 +106,8 @@ def fetch_raw_properties(
 
     logger.info(f"Total properties fetched: {len(all_items)}")
     return all_items
-```
 
-```python
+
 if __name__ == '__main__':
     # Example usage (requires real endpoint, params, and session):
     from data_gathering.features.query_builder.query_builder import build_search_query

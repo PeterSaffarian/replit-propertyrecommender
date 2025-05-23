@@ -1,9 +1,6 @@
 {
   "district": "Christchurch",
-  "suburb": "Ilam",
+  "min_price": 0,
   "max_price": 1000000,
-  "min_bathrooms": 2,
-  "property_types": [
-    "House"
-  ]
+  "min_bedrooms": 3
 }

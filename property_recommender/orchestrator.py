@@ -76,16 +76,14 @@ def main():
 
     # 2. Data gathering
     print("\n🌐  Phase 2: Gathering property data…")
-    gather_data(
-        profile_path=args.profile,
-        raw_output_path=args.raw_out,
-        clean_output_path=args.clean_out,
-        schema_path=Path(__file__).parent / "data_gathering" / "schemas" / "property_record.json",
-        model=args.model,
-        temperature=args.temperature,
-        retries=args.retries,
-        sandbox=args.sandbox
-    )
+    sys.argv = [
+        sys.argv[0],
+        "--profile", str(args.profile),
+        "--output", str(args.raw_out),
+        "--model", args.model,
+        "--temperature", str(args.temperature)
+    ]
+    gather_data()
 
     # 3. Match reasoning
     print("\n🏷️  Phase 3: Scoring and ranking properties…")

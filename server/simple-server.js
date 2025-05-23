@@ -1,30 +1,17 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import { spawn } from 'child_process';
-import { join } from 'path';
-import { readFileSync, existsSync } from 'fs';
+const express = require('express');
+const cors = require('cors');
+const { spawn } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const port = parseInt(process.env.PORT || '3001', 10);
+const port = 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client')));
 
-// Serve static files from client build
-app.use(express.static(join(process.cwd(), 'client')));
-
-interface ProcessStep {
-  id: string;
-  name: string;
-  status: 'pending' | 'running' | 'completed' | 'error';
-  output: string[];
-  error?: string;
-}
-
-let currentProcess: {
-  steps: ProcessStep[];
-  isRunning: boolean;
-} = {
+let currentProcess = {
   steps: [
     { id: 'profile', name: 'Collecting your preferences', status: 'pending', output: [] },
     { id: 'gathering', name: 'Finding properties on Trade Me', status: 'pending', output: [] },
@@ -34,7 +21,7 @@ let currentProcess: {
 };
 
 // Start the property recommendation process
-app.post('/api/start-recommendation', (req: Request, res: Response) => {
+app.post('/api/start-recommendation', (req, res) => {
   if (currentProcess.isRunning) {
     return res.status(400).json({ error: 'Process already running' });
   }
@@ -107,9 +94,9 @@ app.get('/api/status', (req, res) => {
 // Get results if available
 app.get('/api/results', (req, res) => {
   try {
-    const resultsPath = join(process.cwd(), 'property_matches.json');
-    if (existsSync(resultsPath)) {
-      const results = JSON.parse(readFileSync(resultsPath, 'utf-8'));
+    const resultsPath = path.join(process.cwd(), 'property_matches.json');
+    if (fs.existsSync(resultsPath)) {
+      const results = JSON.parse(fs.readFileSync(resultsPath, 'utf-8'));
       res.json(results);
     } else {
       res.status(404).json({ error: 'Results not yet available' });
@@ -121,9 +108,10 @@ app.get('/api/results', (req, res) => {
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(join(process.cwd(), 'client', 'index.html'));
+  res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running at http://0.0.0.0:${port}`);
+  console.log(`🚀 Property Recommender Web Interface running at http://0.0.0.0:${port}`);
+  console.log('Click "Start Finding Properties" to begin the recommendation process!');
 });

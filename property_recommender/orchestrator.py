@@ -89,7 +89,7 @@ def main():
     print("\n🏷️  Phase 3: Scoring and ranking properties…")
     match_properties(
         profile_path=args.profile,
-        listings_path=args.clean_out,
+        listings_path=args.raw_out,
         output_path=args.matches_out,
         schema_path=Path(__file__).parent / "match_reasoning" / "schemas" / "property_match.json",
         model=args.model,

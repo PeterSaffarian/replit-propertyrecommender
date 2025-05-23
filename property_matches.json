@@ -1,102 +1,12 @@
 [
   {
-    "property_id": 2149706177,
-    "score": 0.1,
-    "rationale": "The property is located in Waikato, which does not match the preferred location of Christchurch, Ilam. It meets bedroom and bathroom requirements, but the price is not specified."
+    "property_id": 4775728,
+    "score": 0.9,
+    "rationale": "This property is located in Ilam, Christchurch, matching the desired location. It has 4 bedrooms and 2 bathrooms, meeting the user's minimum requirements. However, since the property is listed for auction, the exact price is unknown, which may exceed the user's budget. Hence, it scores 0.9."
   },
   {
-    "property_id": 2149705839,
-    "score": 0.5,
-    "rationale": "The property meets the price and bedroom requirements, and is close in terms of bathroom count. It is located in Auckland, which is not the preferred location of Christchurch, Ilam."
-  },
-  {
-    "property_id": 2149705710,
-    "score": 0.5,
-    "rationale": "This property meets the price, bedroom, and bathroom requirements but is located in Auckland, which is not the preferred location of Christchurch, Ilam."
-  },
-  {
-    "property_id": 2149705288,
-    "score": 0.1,
-    "rationale": "This property is located in Waikato, not Christchurch, Ilam. It meets the bedroom and bathroom requirements, but the price is not specified."
-  },
-  {
-    "property_id": 2149702777,
-    "score": 0.1,
-    "rationale": "Located in Northland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149702691,
-    "score": 0.1,
-    "rationale": "Located in Northland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149701924,
-    "score": 0.2,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149701534,
-    "score": 0.2,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149701522,
-    "score": 0.2,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149699969,
-    "score": 0.5,
-    "rationale": "In Auckland, not Christchurch, Ilam. Meets price, bedroom, and bathroom requirements."
-  },
-  {
-    "property_id": 2149697084,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149696505,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149695758,
-    "score": 0.1,
-    "rationale": "Located in Waikato, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149694944,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149694886,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149694430,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149693893,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149693793,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Meets bedroom and bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149693304,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bathroom requirements, but the price is unspecified."
-  },
-  {
-    "property_id": 2149693044,
-    "score": 0.1,
-    "rationale": "Located in Auckland, not Christchurch, Ilam. Exceeds bathroom requirements, but the price is unspecified."
+    "property_id": 4761219,
+    "score": 0.9,
+    "rationale": "Located in Ilam, Christchurch, this property fulfills the location preference. It offers 4 bedrooms and 2 bathrooms, aligning with the user's needs. The property is up for auction, so the price is uncertain and could be outside the user's budget range, resulting in a score of 0.9."
   }
 ]

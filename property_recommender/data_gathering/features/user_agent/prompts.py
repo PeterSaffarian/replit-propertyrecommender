@@ -1,82 +1,56 @@
 """
-property_recommender/data_gathering/features/user_agent/prompts.py
+property_recommender/user_interaction/features/prompts.py
 
-This module defines the system and user prompts for the LLM-based "User Agent" feature.
-The LLM will consume a user profile and a JSON schema (search_request_form.json) and output
-strictly a JSON object conforming to that schema, representing the user's property search preferences.
+Defines the system prompt (persona, goals, style) and function-calling metadata
+for our “property interview” ChatHandler. Once enough information has been
+gathered, the model will call `collect_property_profile` with a payload
+that strictly matches the JSON schema in user_interaction/schemas/property_profile.json.
 """
 
 import json
 from pathlib import Path
 
-# Load the JSON schema the LLM must adhere to
-SCHEMA_FILE = Path(__file__).parent.parent.parent / 'schemas' / 'search_request_form.json'
-SEARCH_SCHEMA = json.loads(SCHEMA_FILE.read_text())
+# load the profile schema that the LLM must adhere to
+SCHEMA_FILE = (
+    Path(__file__)
+    .parent        # .../features
+    .parent        # .../user_interaction
+    .parent        # .../property_recommender
+    / "user_interaction"
+    / "schemas"
+    / "property_profile.json"
+)
+PROFILE_SCHEMA = json.loads(SCHEMA_FILE.read_text())
 
+# how we frame the assistant’s role, tone, and expected behavior
 SYSTEM_PROMPT = f"""
-You are the user's dedicated property search assistant. Act as the user's proxy: interpret their
-real estate preferences, make reasonable decisions or educated guesses when details are missing,
-and produce exactly one JSON object that follows the provided schema.
+You are a professional real-estate interviewer, blending tactical empathy (Chris Voss–style)
+with warmth and clarity. Guide an open-ended, human-centric conversation that uncovers
+the user’s real needs, priorities, and context around buying or renting a property.
 
-Rules:
-- You have the authority to decide or infer missing information based on the user's profile.
-- You must include at least one location field: "region", "district", or "suburb". If the profile
-  mentions a city, map it to "district". If uncertain, default the value into "district".
-- Only output valid JSON matching the schema below; do not add extra keys or wrap output in
-  markdown or code fences.
-- All fields are optional; include only those clearly implied by the user's profile.
+• Use mirroring, labeling, and gentle follow-ups rather than rigid Q&A.
+• If the user is uncertain or reluctant, acknowledge it and move on—capture that nuance.
+• When confident you’ve heard enough, call the function `collect_property_profile` with a single
+  JSON payload matching the schema below (no extra keys, no markdown, no code fences):
 
-JSON Schema (draft-07):
-{json.dumps(SEARCH_SCHEMA, indent=2)}
+{json.dumps(PROFILE_SCHEMA, indent=2)}
+
+Key payload rules:
+  • narrative_summary: a free-form paragraph telling the user’s story.
+  • structured_needs: only the fields you’re certain of (bedrooms, bathrooms, budget, locations, timeline).
+  • key_insights: bullet-style strings for salient facts (e.g. “works from home”, “two young children”).
+  • Use numbers for all numeric values.
 """
 
-USER_PROMPT_TEMPLATE = """
-User Profile (raw JSON):
-{user_profile}
-
-Using the schema above, output a JSON object capturing the user's property search criteria.
-For location names, try to use the names from the Trade Me metadata (regions, districts, suburbs),
-especially the specific formal suburb names for each city.
-Deliver only the JSON object, with no explanatory text.
-"""
-
-VALIDATE_SEARCH_QUERY = """
-You are the user's representative. I will give you:
-1. The user's original filled_form JSON (what they wanted).
-2. The candidate search_query JSON (endpoint + params).
-3. Available suburbs for the district (if any).
-
-Task:
-- Verify that params contains "region", "district" and "suburb" IDs.
-- Ensure those IDs correctly match the names in the form.
-- If everything is present and correct, reply with exactly:
-  {"approved": true}
-
-- If suburb is missing or incorrect, suggest alternative suburb names from the available options.
-- For common areas like "Central", "City Centre", try variations like "Central City", "CBD", etc.
-- Otherwise, reply with exactly:
-  {
-    "approved": false,
-    "suggestions": {
-      "<field>": "<new value to retry>"
+# Function-calling spec for the LLM
+FUNCTIONS = [
+    {
+        "name": "collect_property_profile",
+        "description": (
+            "Collects and returns a structured user property preference profile "
+            "with keys narrative_summary, structured_needs, and key_insights. "
+            "Output must conform exactly to the provided JSON schema."
+        ),
+        "parameters": PROFILE_SCHEMA,
     }
-  }
-
-Your response must be pure JSON, no extra text.
-"""
-
-
-def build_user_agent_messages(user_profile: str) -> list:
-    """
-    Construct the messages array for the OpenAI ChatCompletion API.
-
-    Args:
-        user_profile: JSON string of the user's profile.
-
-    Returns:
-        List of messages with 'system' and 'user' roles.
-    """
-    return [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user",   "content": USER_PROMPT_TEMPLATE.format(user_profile=user_profile)},
-    ]
+]

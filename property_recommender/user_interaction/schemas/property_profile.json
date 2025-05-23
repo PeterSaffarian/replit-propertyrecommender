@@ -1,49 +1,58 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Property Preference Profile",
-  "description": "Schema for collecting user preferences for property recommendations.",
+  "title": "Property Profile",
   "type": "object",
   "properties": {
-    "location": {
+    "narrative_summary": {
       "type": "string",
-      "description": "Preferred suburb, city, or region"
+      "description": "Free-form summary of the user’s situation, needs, and priorities."
     },
-    "price_min": {
-      "type": "number",
-      "description": "Minimum price in NZD"
+    "structured_needs": {
+      "type": "object",
+      "description": "Core search parameters when explicitly stated or confidently inferred.",
+      "properties": {
+        "bedrooms": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          },
+          "description": "Number of bedrooms desired."
+        },
+        "bathrooms": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          },
+          "description": "Number of bathrooms desired."
+        },
+        "budget": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          },
+          "description": "Budget range in NZD."
+        },
+        "locations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Preferred suburbs, districts, or regions."
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Desired move-in timeframe (e.g. 'next 3 months')."
+        }
+      },
+      "additionalProperties": false
     },
-    "price_max": {
-      "type": "number",
-      "description": "Maximum price in NZD"
-    },
-    "bedrooms_min": {
-      "type": "integer",
-      "description": "Minimum number of bedrooms"
-    },
-    "bathrooms_min": {
-      "type": "integer",
-      "description": "Minimum number of bathrooms"
-    },
-    "pet_friendly": {
-      "type": "boolean",
-      "description": "Whether the property must be pet-friendly"
-    },
-    "open_homes": {
-      "type": "boolean",
-      "description": "Whether upcoming open homes are required"
-    },
-    "move_in_date": {
-      "type": "string",
-      "format": "date",
-      "description": "Desired move-in date (YYYY-MM-DD)"
+    "key_insights": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Bullet-point highlights for downstream context (e.g. 'works from home', 'needs room for 2 kids')."
     }
   },
-  "required": [
-    "location",
-    "price_min",
-    "price_max",
-    "bedrooms_min",
-    "bathrooms_min"
-  ],
+  "required": ["narrative_summary"],
   "additionalProperties": false
 }

@@ -81,13 +81,13 @@ def fetch_metadata_from_api(metadata_type: str) -> dict:
     """
     key = metadata_type.lower()
     if key == "regions":
-        url = f"{BASE_URL}/localities/regions.json"
+        url = f"{BASE_URL}/Localities/Regions.json"
     elif key == "suburbs":
-        url = f"{BASE_URL}/localities/suburbs.json"
+        url = f"{BASE_URL}/Localities/Suburbs.json"
     elif key == "propertytypes":
-        url = f"{BASE_URL}/metadata/propertytypes.json"
+        url = f"{BASE_URL}/Metadata/PropertyTypes.json"
     elif key == "salesmethods":
-        url = f"{BASE_URL}/metadata/salesmethods.json"
+        url = f"{BASE_URL}/Metadata/SalesMethods.json"
     else:
         raise ValueError(f"Unknown metadata type: {metadata_type!r}")
 

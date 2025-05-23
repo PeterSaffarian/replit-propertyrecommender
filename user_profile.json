@@ -1,7 +1,20 @@
 {
-  "location": "Christchurch, Ilam",
-  "price_min": 300000,
-  "price_max": 850000,
-  "bedrooms_min": 3,
-  "bathrooms_min": 2
+  "narrative_summary": "The family is looking to buy a house near the University of Canterbury to accommodate their child's university attendance. With two kids and a dog, along with both parents working from home, they need ample space. They desire at least two bathrooms, with an extra toilet being a bonus, and have a budget cap of one million NZD. They are ready to purchase as soon as possible.",
+  "structured_needs": {
+    "bathrooms": {
+      "min": 2
+    },
+    "budget": {
+      "max": 1000000
+    },
+    "locations": [
+      "near University of Canterbury"
+    ],
+    "timeline": "ready to buy"
+  },
+  "key_insights": [
+    "two children",
+    "family has a dog",
+    "both parents work from home"
+  ]
 }

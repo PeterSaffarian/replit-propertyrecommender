@@ -63,21 +63,39 @@ function startPythonPipeline(sessionId, socket) {
     socket: socket
   });
 
+  let outputBuffer = '';
+  
   pythonProcess.stdout.on('data', (data) => {
     const output = data.toString();
+    outputBuffer += output;
     console.log('Pipeline output:', output);
     
-    // Parse the output and send to the frontend
-    if (output.includes('Assistant:') || output.includes('A:')) {
-      // Extract the assistant message
-      const assistantMessage = output.split('Assistant:')[1] || output.split('A:')[1];
-      if (assistantMessage) {
-        socket.emit('assistant_message', {
-          content: assistantMessage.trim(),
-          timestamp: Date.now()
-        });
+    // Look for complete assistant messages
+    const lines = outputBuffer.split('\n');
+    
+    for (let i = 0; i < lines.length - 1; i++) {
+      const line = lines[i].trim();
+      
+      // Detect Pete's messages
+      if (line.startsWith('Assistant:') || line.startsWith('A:')) {
+        const message = line.replace(/^(Assistant:|A:)\s*/, '');
+        if (message) {
+          socket.emit('assistant_message', {
+            content: message,
+            timestamp: Date.now()
+          });
+        }
+      }
+      
+      // Detect when waiting for user input
+      if (line.includes('You:') && line.trim().endsWith('You:')) {
+        // Pipeline is ready for user input - no additional message needed
+        console.log('Pipeline ready for user input');
       }
     }
+    
+    // Keep the last incomplete line in buffer
+    outputBuffer = lines[lines.length - 1];
     
     // Check if pipeline completed successfully
     if (output.includes('Pipeline completed') || output.includes('property_matches.json')) {

@@ -1,0 +1,66 @@
+~/workspace$  python chat-server.py
+🚀 Property Recommender Chat Interface
+🌐 Open: http://localhost:8080
+💬 Direct connection to your Python orchestrator!
+==================================================
+172.31.128.21 - - [23/May/2025 23:59:59] "GET / HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:06] "POST /api/start HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:07] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:08] "GET /api/messages HTTP/1.1" 200 -
+Orchestrator output: INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Orchestrator output: 📝  Phase 1: Collecting user profile…
+Orchestrator output: Assistant: Hi! I’m Pete! What can I call you?
+172.31.128.21 - - [24/May/2025 00:00:09] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:10] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:11] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:13] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:14] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:15] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:16] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:18] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:19] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:20] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:21] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:22] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:23] "POST /api/send HTTP/1.1" 200 -
+Orchestrator output: You: INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Orchestrator output: Assistant: Hi! I'm Pete! What can I call you?
+172.31.128.21 - - [24/May/2025 00:00:24] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:25] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:26] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:27] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:29] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:30] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:31] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:32] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:34] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:35] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:36] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:37] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:38] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:40] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:41] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:42] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:43] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:45] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:46] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:47] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:48] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:49] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:51] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:52] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:53] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:54] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:56] "GET /api/messages HTTP/1.1" 200 -
+172.31.128.21 - - [24/May/2025 00:00:57] "GET /api/messages HTTP/1.1" 200 -
+^C
+👋 Shutting down...
+Orchestrator output: You: Traceback (most recent call last):
+Orchestrator output: File "<frozen runpy>", line 198, in _run_module_as_main
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedWriter name='<stdout>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007fe1b5c10b18)
+
+Current thread 0x00007fe1b5c6ce40 (most recent call first):
+  <no Python frame>
+Aborted (core dumped)
+~/workspace$ 

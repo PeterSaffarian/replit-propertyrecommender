@@ -41,7 +41,7 @@ def main():
     parser.add_argument("--temperature", type=float, default=0.7, help="LLM temperature")
     parser.add_argument("--match-mode", choices=["batch", "individual"], default="individual",
         help="Matching mode: batch ranking vs per-record scoring.")
-    parser.add_argument("--max-pages", type=int, default=2,
+    parser.add_argument("--max-records", type=int, default=10,
         help="Maximum number of search result pages to fetch.")
     args = parser.parse_args()
 
@@ -111,10 +111,9 @@ def main():
             f"Query not approved after {MAX_VALIDATION_TRIES} attempts; proceeding with last built query."
         )
 
-    # Step 3: Fetch raw properties (limit to 10 records for faster demo)
+    # Step 3: Fetch raw properties
     try:
         raw_props = fetch_raw_properties(endpoint, params, session, max_records=10)
-        logger.info(f"Limited fetch to 10 records for faster processing")
     except Exception as e:
         logger.error(f"Fetching properties failed: {e}")
         return

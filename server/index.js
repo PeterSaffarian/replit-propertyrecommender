@@ -93,13 +93,37 @@ async function runPropertyPipeline(sessionId) {
   return new Promise((resolve, reject) => {
     console.log('Starting property recommendation pipeline...');
     
+    // Get the session to access user messages
+    const session = chatSessions.get(sessionId);
+    const userMessages = session.messages.filter(msg => msg.role === 'user');
+    const userInput = userMessages.map(msg => msg.content).join('\n');
+    
     const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator'], {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
+    // Send simulated user responses to handle the interactive session
+    let responseCount = 0;
+    const responses = [
+      'User',  // Name response
+      userInput,  // Property preferences
+      'yes'   // Confirmation
+    ];
+
     pythonProcess.stdout.on('data', (data) => {
-      console.log('Pipeline output:', data.toString());
+      const output = data.toString();
+      console.log('Pipeline output:', output);
+      
+      // Detect when the pipeline is waiting for input and provide automated responses
+      if (output.includes('You:') || output.includes('?')) {
+        if (responseCount < responses.length) {
+          setTimeout(() => {
+            pythonProcess.stdin.write(responses[responseCount] + '\n');
+            responseCount++;
+          }, 500);
+        }
+      }
     });
 
     pythonProcess.stderr.on('data', (data) => {

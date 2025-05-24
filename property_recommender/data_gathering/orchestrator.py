@@ -111,9 +111,10 @@ def main():
             f"Query not approved after {MAX_VALIDATION_TRIES} attempts; proceeding with last built query."
         )
 
-    # Step 3: Fetch raw properties
+    # Step 3: Fetch raw properties (limit to 2 pages for faster demo)
     try:
-        raw_props = fetch_raw_properties(endpoint, params, session)
+        raw_props = fetch_raw_properties(endpoint, params, session, max_pages=2)
+        logger.info(f"Limited fetch to 2 pages for faster processing")
     except Exception as e:
         logger.error(f"Fetching properties failed: {e}")
         return

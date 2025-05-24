@@ -1,0 +1,11 @@
+{
+  "endpoint": "https://api.tmsandbox.co.nz/v1/search/property/residential.json",
+  "params": {
+    "suburb": 89,
+    "district": 7,
+    "region": 1,
+    "price_min": 0,
+    "price_max": 2000000,
+    "bedrooms_min": 2
+  }
+}

@@ -132,7 +132,8 @@ class ChatHandler:
             # Otherwise, display assistant message and prompt user
             content = message.content
             print(f"\nAssistant: {content}\n")
-            user_input = input("You: ")
+            print("You: ", end="", flush=True)
+            user_input = input()
             # Record user response and continue
             self.messages.append({"role": "user", "content": user_input})
 

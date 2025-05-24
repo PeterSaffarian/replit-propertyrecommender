@@ -1,1 +1,1 @@
-{"name": "property-recommender-web", "scripts": {"dev": "tsx server/vite.ts"}}
+{"name": "property-recommender-web", "scripts": {"dev": "node server/index.js"}}

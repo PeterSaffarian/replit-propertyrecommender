@@ -1,13 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Recommendation Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #3b82f6;
+            color: white;
+            margin-left: 20%;
+            text-align: right;
+        }
+        .assistant-message {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin-right: 20%;
+        }
+        .property-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 10px 0;
+            background: white;
+        }
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+        }
+        .score-high { background-color: #10b981; }
+        .score-medium { background-color: #f59e0b; }
+        .score-low { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto max-w-4xl p-4">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                🏠 Property Recommendation Assistant
+            </h1>
+            <p class="text-gray-600">
+                Find your perfect property with AI-powered recommendations
+            </p>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-semibold flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
+                    Chat with your Property Assistant
+                </h2>
+            </div>
+            
+            <div id="chat-container" class="chat-container p-4">
+                <div class="message assistant-message">
+                    Welcome! I'll help you find the perfect property. Please tell me about your preferences...
+                </div>
+            </div>
+            
+            <div class="p-4 border-t">
+                <div class="flex gap-2">
+                    <input 
+                        id="message-input" 
+                        type="text" 
+                        placeholder="Tell me about your property preferences..."
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onkeypress="handleKeyPress(event)"
+                    />
+                    <button 
+                        id="send-button"
+                        onclick="sendMessage()" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="bg-white rounded-lg shadow-md" style="display: none;">
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-semibold">🎯 Property Recommendations</h2>
+            </div>
+            <div id="results-container" class="p-4">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let isProcessing = false;
+
+        // Initialize session when page loads
+        window.onload = function() {
+            startSession();
+        };
+
+        async function startSession() {
+            try {
+                const response = await fetch('/api/start-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                sessionId = data.sessionId;
+                addMessage('assistant', data.message);
+            } catch (error) {
+                console.error('Error starting session:', error);
+                addMessage('assistant', 'Sorry, I encountered an error. Please refresh the page to try again.');
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const message = input.value.trim();
+            
+            if (!message || !sessionId || isProcessing) return;
+
+            // Add user message to chat
+            addMessage('user', message);
+            input.value = '';
+            
+            // Disable input during processing
+            input.disabled = true;
+            sendButton.disabled = true;
+            isProcessing = true;
+
+            try {
+                const response = await fetch(`/api/chat/${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                
+                addMessage('assistant', data.message);
+                
+                if (data.status === 'processing') {
+                    // Start polling for results
+                    pollForResults();
+                } else {
+                    // Re-enable input
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    isProcessing = false;
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage('assistant', 'Sorry, I encountered an error processing your message.');
+                input.disabled = false;
+                sendButton.disabled = false;
+                isProcessing = false;
+            }
+        }
+
+        async function pollForResults() {
+            try {
+                const response = await fetch(`/api/session/${sessionId}`);
+                const data = await response.json();
+                
+                if (data.status === 'complete' && data.results) {
+                    addMessage('assistant', data.message);
+                    displayResults(data.results);
+                    
+                    // Re-enable input
+                    document.getElementById('message-input').disabled = false;
+                    document.getElementById('send-button').disabled = false;
+                    isProcessing = false;
+                } else if (data.status === 'processing') {
+                    // Continue polling
+                    setTimeout(pollForResults, 3000);
+                } else {
+                    // Re-enable input if something went wrong
+                    document.getElementById('message-input').disabled = false;
+                    document.getElementById('send-button').disabled = false;
+                    isProcessing = false;
+                }
+            } catch (error) {
+                console.error('Error polling for results:', error);
+                // Re-enable input
+                document.getElementById('message-input').disabled = false;
+                document.getElementById('send-button').disabled = false;
+                isProcessing = false;
+            }
+        }
+
+        function addMessage(role, content) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function displayResults(results) {
+            const resultsSection = document.getElementById('results-section');
+            const resultsContainer = document.getElementById('results-container');
+            
+            resultsContainer.innerHTML = '';
+            
+            results.forEach((match, index) => {
+                const score = Math.round(match.score * 100);
+                const scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-medium' : 'score-low';
+                
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                propertyCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-gray-200 px-2 py-1 rounded text-sm font-semibold">#${index + 1}</span>
+                            <span class="text-lg font-semibold">Property ID: ${match.property_id}</span>
+                        </div>
+                        <span class="score-badge ${scoreClass}">${score}% Match</span>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">${match.rationale}</p>
+                `;
+                resultsContainer.appendChild(propertyCard);
+            });
+            
+            resultsSection.style.display = 'block';
+        }
+    </script>
+</body>
 </html>

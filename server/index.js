@@ -1,7 +1,7 @@
-import express from 'express';
-import { spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+const express = require('express');
+const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
@@ -21,7 +21,10 @@ app.post('/api/start-session', (req, res) => {
     step: 'profile_collection'
   });
   
-  res.json({ sessionId, message: "Hi! I'm here to help you find the perfect property. Let's start by understanding your preferences. What type of property are you looking for?" });
+  res.json({ 
+    sessionId, 
+    message: "Hi! I'm here to help you find the perfect property. Let's start by understanding your preferences. What type of property are you looking for, and what's your budget?" 
+  });
 });
 
 // API route to send message in chat
@@ -34,23 +37,21 @@ app.post('/api/chat/:sessionId', async (req, res) => {
     return res.status(404).json({ error: 'Session not found' });
   }
 
-  // Add user message to session
   session.messages.push({ role: 'user', content: message });
 
   try {
-    // Simulate collecting enough information, then trigger the pipeline
     session.messages.push({ 
       role: 'assistant', 
-      content: "Thank you for that information! Let me gather a few more details and then I'll search for properties that match your needs. This may take a few moments..." 
+      content: "Perfect! I have enough information to start searching. Let me run the property recommendation pipeline to find the best matches for you. This will take a moment..." 
     });
 
-    // Start the property recommendation pipeline
+    // Start the pipeline
     setTimeout(async () => {
       await runPropertyPipeline(sessionId);
     }, 2000);
     
     res.json({ 
-      message: "Perfect! I'm now processing your preferences and searching for the best properties. This will take a moment...",
+      message: "Excellent! I'm now analyzing properties that match your criteria. This will take a moment...",
       status: 'processing'
     });
   } catch (error) {
@@ -78,7 +79,7 @@ app.get('/api/session/:sessionId', (req, res) => {
       res.json({
         status: 'complete',
         results: matches,
-        message: `Excellent! I found ${matches.length} properties that match your criteria. Here are the results ranked by how well they fit your needs:`
+        message: `Great news! I found ${matches.length} properties that match your criteria. Here are the results ranked by how well they fit your needs:`
       });
     } catch (error) {
       res.json({ status: session.step || 'processing' });
@@ -88,7 +89,7 @@ app.get('/api/session/:sessionId', (req, res) => {
   }
 });
 
-async function runPropertyPipeline(sessionId: string): Promise<void> {
+async function runPropertyPipeline(sessionId) {
   return new Promise((resolve, reject) => {
     console.log('Starting property recommendation pipeline...');
     
@@ -97,16 +98,11 @@ async function runPropertyPipeline(sessionId: string): Promise<void> {
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    let output = '';
-    let errorOutput = '';
-
     pythonProcess.stdout.on('data', (data) => {
-      output += data.toString();
       console.log('Pipeline output:', data.toString());
     });
 
     pythonProcess.stderr.on('data', (data) => {
-      errorOutput += data.toString();
       console.error('Pipeline error:', data.toString());
     });
 
@@ -117,7 +113,6 @@ async function runPropertyPipeline(sessionId: string): Promise<void> {
         resolve();
       } else {
         console.error(`Pipeline failed with code ${code}`);
-        console.error('Error output:', errorOutput);
         reject(new Error(`Pipeline failed with code ${code}`));
       }
     });

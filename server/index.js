@@ -1,9 +1,9 @@
 const express = require('express');
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
+const { spawn } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,118 +17,90 @@ const io = socketIo(server, {
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-// Serve static files from client/dist if it exists, otherwise serve from client
-const path = require('path');
-const fs = require('fs');
-
-if (fs.existsSync(path.join(__dirname, '../client/dist'))) {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-} else {
-  app.use(express.static(path.join(__dirname, '../client')));
-}
-
-// Serve React app for any non-API routes
-app.get('*', (req, res) => {
-  if (req.path.startsWith('/api')) return;
-  
-  if (fs.existsSync(path.join(__dirname, '../client/dist/index.html'))) {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-  } else {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
-  }
-});
+app.use(express.static(path.join(__dirname, '../client')));
 
 // Store active Python processes by session
 const activeSessions = new Map();
 
+// Serve the HTML file for all routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
+// WebSocket connection handling
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('Client connected:', socket.id);
 
   socket.on('start_session', (sessionId) => {
-    console.log('Starting new session:', sessionId);
+    console.log('Starting session:', sessionId);
     
-    // Start Python orchestrator
+    // Start the Python property recommendation pipeline
     const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator'], {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    // Store the session
     activeSessions.set(sessionId, {
       process: pythonProcess,
-      socket: socket,
-      buffer: ''
+      socketId: socket.id,
+      phase: 'profile'
     });
 
-    // Handle Python output
+    // Handle Python process output (Pete's messages)
     pythonProcess.stdout.on('data', (data) => {
-      const session = activeSessions.get(sessionId);
-      if (!session) return;
-
       const output = data.toString();
-      session.buffer += output;
+      console.log('Python output:', output);
       
-      console.log('Raw Python output:', output);
+      // Send Pete's messages to the client
+      socket.emit('pete_message', {
+        content: output.trim(),
+        timestamp: Date.now()
+      });
+    });
 
-      // Look for Pete's messages - they start with "Assistant: "
-      const lines = session.buffer.split('\n');
+    // Handle Python process errors
+    pythonProcess.stderr.on('data', (data) => {
+      const error = data.toString();
+      console.log('Python error:', error);
       
-      for (let i = 0; i < lines.length - 1; i++) {
-        const line = lines[i];
-        
-        // Pete's message detection
-        if (line.startsWith('Assistant: ')) {
-          const peteMessage = line.substring(11); // Remove "Assistant: "
-          console.log('Pete says:', peteMessage);
-          
-          socket.emit('pete_message', {
-            content: peteMessage,
-            timestamp: Date.now()
-          });
-        }
-        
-        // Phase detection
-        if (line.includes('Phase 1:')) {
-          socket.emit('phase_update', { phase: 'profile', message: line });
-        } else if (line.includes('Phase 2:')) {
-          socket.emit('phase_update', { phase: 'data', message: line });
-        } else if (line.includes('Phase 3:')) {
-          socket.emit('phase_update', { phase: 'matching', message: line });
-        } else if (line.includes('Pipeline complete')) {
-          // Load and send final results
+      socket.emit('pipeline_error', {
+        message: `Error: ${error.trim()}`,
+        timestamp: Date.now()
+      });
+    });
+
+    // Handle process completion
+    pythonProcess.on('close', (code) => {
+      console.log(`Python process exited with code ${code}`);
+      
+      if (code === 0) {
+        // Try to read the results file
+        try {
           const resultsPath = path.join(process.cwd(), 'property_matches.json');
           if (fs.existsSync(resultsPath)) {
             const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
             socket.emit('results_ready', {
-              results: results.slice(0, 5),
+              results: results,
               timestamp: Date.now()
             });
           }
+        } catch (error) {
+          console.log('Error reading results:', error);
         }
+        
+        socket.emit('pipeline_complete', {
+          message: 'Property recommendation pipeline completed successfully!',
+          timestamp: Date.now()
+        });
       }
       
-      // Keep the last incomplete line
-      session.buffer = lines[lines.length - 1];
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      console.log('Python stderr:', data.toString());
-    });
-
-    pythonProcess.on('close', (code) => {
-      console.log(`Python process exited with code ${code}`);
       activeSessions.delete(sessionId);
-      
-      if (code === 0) {
-        socket.emit('pipeline_complete', { success: true });
-      } else {
-        socket.emit('pipeline_error', { message: 'Pipeline failed' });
-      }
     });
 
-    pythonProcess.on('error', (error) => {
-      console.error('Failed to start Python process:', error);
-      socket.emit('pipeline_error', { message: 'Failed to start recommendation system' });
+    // Send initial message
+    socket.emit('pete_message', {
+      content: "Hello! I'm Pete, your property recommendation assistant. Let me start by gathering some information about your preferences...",
+      timestamp: Date.now()
     });
   });
 
@@ -144,7 +116,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('Client disconnected:', socket.id);
+    
+    // Clean up any active sessions for this socket
+    for (const [sessionId, session] of activeSessions.entries()) {
+      if (session.socketId === socket.id) {
+        if (session.process) {
+          session.process.kill();
+        }
+        activeSessions.delete(sessionId);
+      }
+    }
   });
 });
 

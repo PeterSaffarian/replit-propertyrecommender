@@ -194,6 +194,11 @@ def fetch_raw_properties(
 
     logger.info(f"Total listing IDs collected: {len(all_listing_ids)}")
 
+    # Apply max_records limit to listing IDs if specified
+    if max_records and len(all_listing_ids) > max_records:
+        all_listing_ids = all_listing_ids[:max_records]
+        logger.info(f"Trimmed listing IDs to max_records={max_records}")
+
     # Step 2: Fetch complete details for each listing
     complete_listings: List[Dict[str, Any]] = []
     

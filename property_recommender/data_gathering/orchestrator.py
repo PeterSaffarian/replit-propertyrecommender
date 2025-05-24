@@ -39,7 +39,6 @@ def main():
     parser.add_argument("--output",      help="Path to save raw_properties.json")
     parser.add_argument("--model",       default="gpt-4o", help="OpenAI model to use")
     parser.add_argument("--temperature", type=float, default=0.7, help="LLM temperature")
-    parser.add_argument("--max-pages",   type=int, default=5, help="Maximum pages to fetch (default: 1 for testing)")
     args = parser.parse_args()
 
     logger.info("Starting property-recommender orchestration...")
@@ -110,8 +109,7 @@ def main():
 
     # Step 3: Fetch raw properties
     try:
-        raw_props = fetch_raw_properties(endpoint, params, session, max_pages=args.max_pages)
-        logger.info(f"Limited fetch to {args.max_pages} page(s) for faster testing")
+        raw_props = fetch_raw_properties(endpoint, params, session)
     except Exception as e:
         logger.error(f"Fetching properties failed: {e}")
         return

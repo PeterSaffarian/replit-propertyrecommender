@@ -17,7 +17,26 @@ const io = socketIo(server, {
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(express.static('client'));
+// Serve static files from client/dist if it exists, otherwise serve from client
+const path = require('path');
+const fs = require('fs');
+
+if (fs.existsSync(path.join(__dirname, '../client/dist'))) {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+} else {
+  app.use(express.static(path.join(__dirname, '../client')));
+}
+
+// Serve React app for any non-API routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) return;
+  
+  if (fs.existsSync(path.join(__dirname, '../client/dist/index.html'))) {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  } else {
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+  }
+});
 
 // Store active Python processes by session
 const activeSessions = new Map();

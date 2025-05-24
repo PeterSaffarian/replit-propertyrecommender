@@ -5,244 +5,262 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Recommendation Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .chat-container {
-            height: 500px;
-            overflow-y: auto;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .user-message {
-            background-color: #3b82f6;
-            color: white;
-            margin-left: 20%;
-            text-align: right;
-        }
-        .assistant-message {
-            background-color: #f3f4f6;
-            color: #1f2937;
-            margin-right: 20%;
-        }
-        .property-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 10px 0;
-            background: white;
-        }
-        .score-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-        }
-        .score-high { background-color: #10b981; }
-        .score-medium { background-color: #f59e0b; }
-        .score-low { background-color: #ef4444; }
-    </style>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
-<body class="bg-gray-50">
-    <div class="container mx-auto max-w-4xl p-4">
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                🏠 Property Recommendation Assistant
-            </h1>
-            <p class="text-gray-600">
-                Find your perfect property with AI-powered recommendations
-            </p>
-        </div>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-        <!-- Chat Section -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="p-4 border-b">
-                <h2 class="text-xl font-semibold flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                    Chat with your Property Assistant
-                </h2>
-            </div>
-            
-            <div id="chat-container" class="chat-container p-4">
-                <div class="message assistant-message">
-                    Welcome! I'll help you find the perfect property. Please tell me about your preferences...
-                </div>
-            </div>
-            
-            <div class="p-4 border-t">
-                <div class="flex gap-2">
-                    <input 
-                        id="message-input" 
-                        type="text" 
-                        placeholder="Tell me about your property preferences..."
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onkeypress="handleKeyPress(event)"
-                    />
-                    <button 
-                        id="send-button"
-                        onclick="sendMessage()" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        Send
-                    </button>
-                </div>
-            </div>
-        </div>
+        function Chat() {
+            const [messages, setMessages] = useState([]);
+            const [input, setInput] = useState('');
+            const [isConnected, setIsConnected] = useState(false);
+            const [currentPhase, setCurrentPhase] = useState('');
+            const [sessionId] = useState(() => Math.random().toString(36).substring(7));
+            const socketRef = useRef(null);
+            const messagesEndRef = useRef(null);
 
-        <!-- Results Section -->
-        <div id="results-section" class="bg-white rounded-lg shadow-md" style="display: none;">
-            <div class="p-4 border-b">
-                <h2 class="text-xl font-semibold">🎯 Property Recommendations</h2>
-            </div>
-            <div id="results-container" class="p-4">
-                <!-- Results will be populated here -->
-            </div>
-        </div>
-    </div>
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
 
-    <script>
-        let sessionId = null;
-        let isProcessing = false;
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
 
-        // Initialize session when page loads
-        window.onload = function() {
-            startSession();
-        };
+            useEffect(() => {
+                // Connect to WebSocket
+                const socket = io();
+                socketRef.current = socket;
 
-        async function startSession() {
-            try {
-                const response = await fetch('/api/start-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const data = await response.json();
-                sessionId = data.sessionId;
-                addMessage('assistant', data.message);
-            } catch (error) {
-                console.error('Error starting session:', error);
-                addMessage('assistant', 'Sorry, I encountered an error. Please refresh the page to try again.');
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('message-input');
-            const sendButton = document.getElementById('send-button');
-            const message = input.value.trim();
-            
-            if (!message || !sessionId || isProcessing) return;
-
-            // Add user message to chat
-            addMessage('user', message);
-            input.value = '';
-            
-            // Disable input during processing
-            input.disabled = true;
-            sendButton.disabled = true;
-            isProcessing = true;
-
-            try {
-                const response = await fetch(`/api/chat/${sessionId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-                const data = await response.json();
-                
-                addMessage('assistant', data.message);
-                
-                if (data.status === 'processing') {
-                    // Start polling for results
-                    pollForResults();
-                } else {
-                    // Re-enable input
-                    input.disabled = false;
-                    sendButton.disabled = false;
-                    isProcessing = false;
-                }
-            } catch (error) {
-                console.error('Error sending message:', error);
-                addMessage('assistant', 'Sorry, I encountered an error processing your message.');
-                input.disabled = false;
-                sendButton.disabled = false;
-                isProcessing = false;
-            }
-        }
-
-        async function pollForResults() {
-            try {
-                const response = await fetch(`/api/session/${sessionId}`);
-                const data = await response.json();
-                
-                if (data.status === 'complete' && data.results) {
-                    addMessage('assistant', data.message);
-                    displayResults(data.results);
+                socket.on('connect', () => {
+                    console.log('Connected to server');
+                    setIsConnected(true);
                     
-                    // Re-enable input
-                    document.getElementById('message-input').disabled = false;
-                    document.getElementById('send-button').disabled = false;
-                    isProcessing = false;
-                } else if (data.status === 'processing') {
-                    // Continue polling
-                    setTimeout(pollForResults, 3000);
-                } else {
-                    // Re-enable input if something went wrong
-                    document.getElementById('message-input').disabled = false;
-                    document.getElementById('send-button').disabled = false;
-                    isProcessing = false;
-                }
-            } catch (error) {
-                console.error('Error polling for results:', error);
-                // Re-enable input
-                document.getElementById('message-input').disabled = false;
-                document.getElementById('send-button').disabled = false;
-                isProcessing = false;
-            }
-        }
+                    // Automatically start the session
+                    socket.emit('start_session', sessionId);
+                });
 
-        function addMessage(role, content) {
-            const chatContainer = document.getElementById('chat-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}-message`;
-            messageDiv.textContent = content;
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+                socket.on('disconnect', () => {
+                    console.log('Disconnected from server');
+                    setIsConnected(false);
+                });
 
-        function displayResults(results) {
-            const resultsSection = document.getElementById('results-section');
-            const resultsContainer = document.getElementById('results-container');
-            
-            resultsContainer.innerHTML = '';
-            
-            results.forEach((match, index) => {
-                const score = Math.round(match.score * 100);
-                const scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-medium' : 'score-low';
+                // Pete's messages from the Python CLI
+                socket.on('pete_message', (data) => {
+                    console.log('Pete message received:', data);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: data.content,
+                        timestamp: data.timestamp
+                    }]);
+                });
+
+                // Phase updates
+                socket.on('phase_update', (data) => {
+                    console.log('Phase update:', data);
+                    setCurrentPhase(data.phase);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: `📍 ${data.message}`,
+                        timestamp: Date.now()
+                    }]);
+                });
+
+                // Final results
+                socket.on('results_ready', (data) => {
+                    console.log('Results received:', data);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: `🎉 Great! I found ${data.results.length} properties that match your criteria. Here are the top recommendations:`,
+                        timestamp: data.timestamp,
+                        results: data.results
+                    }]);
+                });
+
+                // Pipeline completion
+                socket.on('pipeline_complete', (data) => {
+                    console.log('Pipeline complete:', data);
+                    setCurrentPhase('complete');
+                });
+
+                // Errors
+                socket.on('pipeline_error', (data) => {
+                    console.log('Pipeline error:', data);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: `❌ ${data.message}`,
+                        timestamp: Date.now()
+                    }]);
+                });
+
+                return () => {
+                    socket.disconnect();
+                };
+            }, [sessionId]);
+
+            const sendMessage = () => {
+                if (!input.trim() || !socketRef.current) return;
+
+                const userMessage = {
+                    role: 'user',
+                    content: input,
+                    timestamp: Date.now()
+                };
+
+                setMessages(prev => [...prev, userMessage]);
                 
-                const propertyCard = document.createElement('div');
-                propertyCard.className = 'property-card';
-                propertyCard.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-gray-200 px-2 py-1 rounded text-sm font-semibold">#${index + 1}</span>
-                            <span class="text-lg font-semibold">Property ID: ${match.property_id}</span>
+                // Send user response to Python process
+                socketRef.current.emit('user_response', {
+                    sessionId,
+                    message: input
+                });
+
+                setInput('');
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            };
+
+            return (
+                <div className="flex flex-col h-screen bg-gray-50">
+                    {/* Header */}
+                    <div className="bg-white border-b px-6 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">🏠</span>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-semibold text-gray-900">Property Recommendation Assistant</h1>
+                                <p className="text-sm text-gray-600">Chat with Pete to find your perfect property</p>
+                            </div>
+                            <div className="ml-auto flex items-center gap-3">
+                                {currentPhase && (
+                                    <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                        {currentPhase === 'profile' && '👤 Collecting Profile'}
+                                        {currentPhase === 'data' && '🌐 Gathering Data'}
+                                        {currentPhase === 'matching' && '🔍 Finding Matches'}
+                                        {currentPhase === 'complete' && '✅ Complete'}
+                                    </div>
+                                )}
+                                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                    isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {isConnected ? '● Connected' : '● Disconnected'}
+                                </div>
+                            </div>
                         </div>
-                        <span class="score-badge ${scoreClass}">${score}% Match</span>
                     </div>
-                    <p class="text-gray-600 leading-relaxed">${match.rationale}</p>
-                `;
-                resultsContainer.appendChild(propertyCard);
-            });
-            
-            resultsSection.style.display = 'block';
+
+                    {/* Chat Messages */}
+                    <div className="flex-1 overflow-y-auto px-6 py-4">
+                        <div className="max-w-4xl mx-auto space-y-4">
+                            {/* Welcome message */}
+                            {messages.length === 0 && (
+                                <div className="bg-white rounded-lg p-6 border">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <span className="text-white text-sm">🤖</span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-gray-900 font-medium mb-2">Welcome to Property Chat!</p>
+                                            <p className="text-gray-600 mb-4">
+                                                Pete is starting up and will begin the conversation shortly...
+                                            </p>
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                <p className="text-blue-800 text-sm">
+                                                    <strong>Connecting to your property recommendation system...</strong>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Chat messages */}
+                            {messages.map((message, index) => (
+                                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-3xl ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border'} rounded-lg p-4`}>
+                                        {message.role === 'assistant' && (
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                                                    <span className="text-white text-xs">🤖</span>
+                                                </div>
+                                                <span className="font-medium text-gray-900">Pete</span>
+                                            </div>
+                                        )}
+                                        
+                                        <p className={`${message.role === 'user' ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap`}>
+                                            {message.content}
+                                        </p>
+
+                                        {/* Property Results */}
+                                        {message.results && message.results.length > 0 && (
+                                            <div className="mt-4 space-y-3">
+                                                {message.results.map((match, matchIndex) => (
+                                                    <div key={matchIndex} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <h4 className="font-medium text-gray-900">Property #{match.property_id}</h4>
+                                                            <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                                                                {Math.round(match.score * 100)}% match
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-gray-700 text-sm">{match.rationale}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <div className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                                            {new Date(message.timestamp).toLocaleTimeString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+                    </div>
+
+                    {/* Input Area */}
+                    <div className="bg-white border-t px-6 py-4">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="flex gap-3">
+                                <input
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    placeholder="Type your response to Pete..."
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    disabled={!isConnected}
+                                />
+                                <button
+                                    onClick={sendMessage}
+                                    disabled={!input.trim() || !isConnected}
+                                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                            {!isConnected && (
+                                <p className="text-red-600 text-sm mt-2">Connecting to recommendation system...</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
         }
+
+        ReactDOM.render(<Chat />, document.getElementById('root'));
     </script>
 </body>
 </html>

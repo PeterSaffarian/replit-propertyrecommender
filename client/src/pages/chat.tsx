@@ -18,6 +18,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isConnected, setIsConnected] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState('');
   const [sessionId] = useState(() => Math.random().toString(36).substring(7));
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -39,8 +40,8 @@ export default function Chat() {
       console.log('Connected to server');
       setIsConnected(true);
       
-      // Start the chat session automatically
-      socket.emit('start_chat', sessionId);
+      // Automatically start the session
+      socket.emit('start_session', sessionId);
     });
 
     socket.on('disconnect', () => {
@@ -48,8 +49,9 @@ export default function Chat() {
       setIsConnected(false);
     });
 
-    socket.on('assistant_message', (data) => {
-      console.log('Received assistant message:', data);
+    // Pete's messages from the Python CLI
+    socket.on('pete_message', (data) => {
+      console.log('Pete message received:', data);
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: data.content,
@@ -57,22 +59,41 @@ export default function Chat() {
       }]);
     });
 
-    socket.on('results_ready', (data) => {
-      console.log('Received results:', data);
+    // Phase updates
+    socket.on('phase_update', (data) => {
+      console.log('Phase update:', data);
+      setCurrentPhase(data.phase);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `Great! I found ${data.results.length} properties that match your criteria. Here are the top recommendations:`,
+        content: `📍 ${data.message}`,
+        timestamp: Date.now()
+      }]);
+    });
+
+    // Final results
+    socket.on('results_ready', (data) => {
+      console.log('Results received:', data);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `🎉 Great! I found ${data.results.length} properties that match your criteria. Here are the top recommendations:`,
         timestamp: data.timestamp,
         results: data.results
       }]);
     });
 
+    // Pipeline completion
+    socket.on('pipeline_complete', (data) => {
+      console.log('Pipeline complete:', data);
+      setCurrentPhase('complete');
+    });
+
+    // Errors
     socket.on('pipeline_error', (data) => {
       console.log('Pipeline error:', data);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: data.message,
-        timestamp: data.timestamp
+        content: `❌ ${data.message}`,
+        timestamp: Date.now()
       }]);
     });
 
@@ -92,8 +113,8 @@ export default function Chat() {
 
     setMessages(prev => [...prev, userMessage]);
     
-    // Send message to server via WebSocket
-    socketRef.current.emit('user_message', {
+    // Send user response to Python process
+    socketRef.current.emit('user_response', {
       sessionId,
       message: input
     });
@@ -118,9 +139,17 @@ export default function Chat() {
           </div>
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Property Recommendation Assistant</h1>
-            <p className="text-sm text-gray-600">Find your perfect property with AI-powered recommendations</p>
+            <p className="text-sm text-gray-600">Chat with Pete to find your perfect property</p>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            {currentPhase && (
+              <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                {currentPhase === 'profile' && '👤 Collecting Profile'}
+                {currentPhase === 'data' && '🌐 Gathering Data'}
+                {currentPhase === 'matching' && '🔍 Finding Matches'}
+                {currentPhase === 'complete' && '✅ Complete'}
+              </div>
+            )}
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
               isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
             }`}>
@@ -141,13 +170,13 @@ export default function Chat() {
                   <span className="text-white text-sm">🤖</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-900 font-medium mb-2">Chat with your Property Assistant</p>
+                  <p className="text-gray-900 font-medium mb-2">Welcome to Property Chat!</p>
                   <p className="text-gray-600 mb-4">
-                    Welcome! I'll help you find the perfect property. Please tell me about your preferences...
+                    Pete is starting up and will begin the conversation shortly...
                   </p>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-blue-800 text-sm">
-                      <strong>Pete is starting up...</strong> The conversation will begin automatically once connected.
+                      <strong>Connecting to your property recommendation system...</strong>
                     </p>
                   </div>
                 </div>
@@ -208,7 +237,7 @@ export default function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Tell me about your property preferences..."
+              placeholder="Type your response to Pete..."
               className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={!isConnected}
             />
@@ -221,7 +250,7 @@ export default function Chat() {
             </button>
           </div>
           {!isConnected && (
-            <p className="text-red-600 text-sm mt-2">Connecting to property recommendation system...</p>
+            <p className="text-red-600 text-sm mt-2">Connecting to recommendation system...</p>
           )}
         </div>
       </div>

@@ -39,7 +39,7 @@ def main():
     parser.add_argument("--output",      help="Path to save raw_properties.json")
     parser.add_argument("--model",       default="gpt-4o", help="OpenAI model to use")
     parser.add_argument("--temperature", type=float, default=0.7, help="LLM temperature")
-    parser.add_argument("--max-pages",   type=int, default=1, help="Maximum pages to fetch (default: 1 for testing)")
+    parser.add_argument("--max-pages",   type=int, default=5, help="Maximum pages to fetch (default: 1 for testing)")
     args = parser.parse_args()
 
     logger.info("Starting property-recommender orchestration...")

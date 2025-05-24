@@ -93,37 +93,16 @@ async function runPropertyPipeline(sessionId) {
   return new Promise((resolve, reject) => {
     console.log('Starting property recommendation pipeline...');
     
-    // Get the session to access user messages
-    const session = chatSessions.get(sessionId);
-    const userMessages = session.messages.filter(msg => msg.role === 'user');
-    const userInput = userMessages.map(msg => msg.content).join('\n');
+    // Since user_profile.json already exists, skip interactive phase and run data gathering + matching
+    console.log('Using existing user profile, running data gathering and matching phases...');
     
-    const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator'], {
+    const pythonProcess = spawn('python', ['-m', 'property_recommender.data_gathering.orchestrator'], {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    // Send simulated user responses to handle the interactive session
-    let responseCount = 0;
-    const responses = [
-      'User',  // Name response
-      userInput,  // Property preferences
-      'yes'   // Confirmation
-    ];
-
     pythonProcess.stdout.on('data', (data) => {
-      const output = data.toString();
-      console.log('Pipeline output:', output);
-      
-      // Detect when the pipeline is waiting for input and provide automated responses
-      if (output.includes('You:') || output.includes('?')) {
-        if (responseCount < responses.length) {
-          setTimeout(() => {
-            pythonProcess.stdin.write(responses[responseCount] + '\n');
-            responseCount++;
-          }, 500);
-        }
-      }
+      console.log('Pipeline output:', data.toString());
     });
 
     pythonProcess.stderr.on('data', (data) => {
@@ -131,18 +110,46 @@ async function runPropertyPipeline(sessionId) {
     });
 
     pythonProcess.on('close', (code) => {
-      console.log(`Pipeline process exited with code ${code}`);
+      console.log(`Data gathering exited with code ${code}`);
       if (code === 0) {
-        console.log('Pipeline completed successfully');
-        resolve();
+        // Now run the match reasoning phase
+        console.log('Running match reasoning phase...');
+        const matchProcess = spawn('python', ['-m', 'property_recommender.match_reasoning.orchestrator'], {
+          cwd: process.cwd(),
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+
+        matchProcess.stdout.on('data', (data) => {
+          console.log('Match output:', data.toString());
+        });
+
+        matchProcess.stderr.on('data', (data) => {
+          console.error('Match error:', data.toString());
+        });
+
+        matchProcess.on('close', (matchCode) => {
+          console.log(`Match reasoning exited with code ${matchCode}`);
+          if (matchCode === 0) {
+            console.log('Pipeline completed successfully');
+            resolve();
+          } else {
+            console.error(`Match reasoning failed with code ${matchCode}`);
+            reject(new Error(`Match reasoning failed with code ${matchCode}`));
+          }
+        });
+
+        matchProcess.on('error', (error) => {
+          console.error('Failed to start match reasoning:', error);
+          reject(error);
+        });
       } else {
-        console.error(`Pipeline failed with code ${code}`);
-        reject(new Error(`Pipeline failed with code ${code}`));
+        console.error(`Data gathering failed with code ${code}`);
+        reject(new Error(`Data gathering failed with code ${code}`));
       }
     });
 
     pythonProcess.on('error', (error) => {
-      console.error('Failed to start pipeline:', error);
+      console.error('Failed to start data gathering:', error);
       reject(error);
     });
   });

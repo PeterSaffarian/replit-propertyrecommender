@@ -257,7 +257,7 @@ class Matcher:
         return matches
 
     # Alias: choose default behavior here
-    match = match_batch  # or switch to match_individual
+    match = match_individual  # or switch to match_batch
 
 # Example standalone usage
 if __name__ == "__main__":

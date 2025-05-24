@@ -98,7 +98,7 @@ def main():
         help="Number of retry attempts for LLM calls"
     )
     parser.add_argument(
-        "--mode", choices=["batch", "individual"], default="batch",
+        "--mode", choices=["batch", "individual"], default="individual",
         help="Mode of matching: 'batch' for one-shot ranking, 'individual' for per-record scoring"
     )
 

@@ -59,7 +59,7 @@ def main():
         help="Use Trade Me sandbox endpoints for data gathering."
     )
     parser.add_argument(
-        "--match-mode", choices=["batch", "individual"], default="batch",
+        "--match-mode", choices=["batch", "individual"], default="individual",
         help="Matching mode: batch ranking vs per-record scoring."
     )
     args = parser.parse_args()

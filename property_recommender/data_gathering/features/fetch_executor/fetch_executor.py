@@ -99,6 +99,7 @@ def fetch_raw_properties(
     params: Dict[str, Any],
     session,
     max_pages: Optional[int] = None,
+    max_records: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """
     Fetch complete property listing details from Trade Me.
@@ -111,6 +112,7 @@ def fetch_raw_properties(
         params: Query parameters (excluding 'page').
         session: Authenticated OAuth1 session.
         max_pages: Optional cap on number of pages to fetch.
+        max_records: Optional cap on total number of records to fetch.
 
     Returns:
         List of complete raw property listing objects (no processing).
@@ -180,6 +182,9 @@ def fetch_raw_properties(
             break
         if max_pages and page >= max_pages:
             logger.info(f"Reached max_pages={max_pages}, ending search fetch.")
+            break
+        if max_records and len(all_listing_ids) >= max_records:
+            logger.info(f"Reached max_records={max_records}, ending search fetch.")
             break
         if fetched >= total:
             logger.info(f"Fetched all {total} search items across {page} pages.")

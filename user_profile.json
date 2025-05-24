@@ -1,5 +1,5 @@
 {
-  "narrative_summary": "John is looking for a property near Auckland University. He needs at least two bedrooms and has a budget cap of 2 million NZD. He's flexible about the type of property and is ready to make a purchase whenever the right opportunity arises.",
+  "narrative_summary": "John is looking for a property in the city center of Auckland, with a strong emphasis on location. He is interested in a 2-bedroom apartment or potentially larger, with a budget of around 2 million NZD. His primary focus is on being in the city center, indicating the importance of location over other factors.",
   "structured_needs": {
     "bedrooms": {
       "min": 2
@@ -8,13 +8,12 @@
       "max": 2000000
     },
     "locations": [
-      "Auckland"
-    ],
-    "timeline": "ready to buy whenever"
+      "Auckland City Center"
+    ]
   },
   "key_insights": [
-    "needs proximity to Auckland University",
-    "ready to buy immediately",
-    "flexible on property type"
+    "Location in Auckland City Center is a priority",
+    "Interested in a 2-bedroom or more",
+    "Budget around 2 million NZD"
   ]
 }

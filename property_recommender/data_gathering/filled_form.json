@@ -1,6 +1,10 @@
 {
   "district": "Auckland",
+  "suburb": "Auckland Central",
   "min_price": 0,
   "max_price": 2000000,
-  "min_bedrooms": 2
+  "min_bedrooms": 2,
+  "property_types": [
+    "Apartment"
+  ]
 }

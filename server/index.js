@@ -34,8 +34,8 @@ io.on('connection', (socket) => {
   socket.on('start_session', (sessionId) => {
     console.log('Starting session:', sessionId);
     
-    // Start the Python property recommendation pipeline
-    const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator'], {
+    // Start the Python property recommendation pipeline with limited pages for faster testing
+    const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator', '--max-pages', '1'], {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe']
     });

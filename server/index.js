@@ -2,159 +2,141 @@ const express = require('express');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.static('client'));
 
-// Store chat sessions
-const chatSessions = new Map();
+// In-memory storage for active Python processes
+const activePipelines = new Map();
 
-// API route to start a new chat session
-app.post('/api/start-session', (req, res) => {
-  const sessionId = Date.now().toString();
-  chatSessions.set(sessionId, {
-    status: 'active',
-    messages: [],
-    step: 'profile_collection'
-  });
-  
-  res.json({ 
-    sessionId, 
-    message: "Hi! I'm here to help you find the perfect property. Let's start by understanding your preferences. What type of property are you looking for, and what's your budget?" 
-  });
-});
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
 
-// API route to send message in chat
-app.post('/api/chat/:sessionId', async (req, res) => {
-  const { sessionId } = req.params;
-  const { message } = req.body;
-  
-  const session = chatSessions.get(sessionId);
-  if (!session) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  session.messages.push({ role: 'user', content: message });
-
-  try {
-    session.messages.push({ 
-      role: 'assistant', 
-      content: "Perfect! I have enough information to start searching. Let me run the property recommendation pipeline to find the best matches for you. This will take a moment..." 
-    });
-
-    // Start the pipeline
-    setTimeout(async () => {
-      await runPropertyPipeline(sessionId);
-    }, 2000);
+  socket.on('start_chat', (sessionId) => {
+    console.log('Starting chat session:', sessionId);
     
-    res.json({ 
-      message: "Excellent! I'm now analyzing properties that match your criteria. This will take a moment...",
-      status: 'processing'
-    });
-  } catch (error) {
-    console.error('Error processing message:', error);
-    res.status(500).json({ error: 'Failed to process message' });
-  }
-});
+    // Start the Python pipeline for this session
+    startPythonPipeline(sessionId, socket);
+  });
 
-// API route to get session status and results
-app.get('/api/session/:sessionId', (req, res) => {
-  const { sessionId } = req.params;
-  const session = chatSessions.get(sessionId);
-  
-  if (!session) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  // Check if results are ready
-  if (fs.existsSync('./property_matches.json')) {
-    try {
-      const matches = JSON.parse(fs.readFileSync('./property_matches.json', 'utf8'));
-      session.step = 'complete';
-      session.results = matches;
-      
-      res.json({
-        status: 'complete',
-        results: matches,
-        message: `Great news! I found ${matches.length} properties that match your criteria. Here are the results ranked by how well they fit your needs:`
-      });
-    } catch (error) {
-      res.json({ status: session.step || 'processing' });
+  socket.on('user_message', (data) => {
+    const { sessionId, message } = data;
+    console.log('User message received:', message);
+    
+    // Send the user's message to the Python pipeline
+    const pipeline = activePipelines.get(sessionId);
+    if (pipeline && pipeline.process) {
+      pipeline.process.stdin.write(message + '\n');
     }
-  } else {
-    res.json({ status: session.step || 'processing' });
-  }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 });
 
-async function runPropertyPipeline(sessionId) {
-  return new Promise((resolve, reject) => {
-    console.log('Starting property recommendation pipeline...');
+function startPythonPipeline(sessionId, socket) {
+  console.log('Starting Python pipeline for session:', sessionId);
+  
+  const pythonProcess = spawn('python', ['-m', 'property_recommender.orchestrator'], {
+    cwd: process.cwd(),
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+
+  // Store the process for this session
+  activePipelines.set(sessionId, {
+    process: pythonProcess,
+    socket: socket
+  });
+
+  pythonProcess.stdout.on('data', (data) => {
+    const output = data.toString();
+    console.log('Pipeline output:', output);
     
-    // Since user_profile.json already exists, skip interactive phase and run data gathering + matching
-    console.log('Using existing user profile, running data gathering and matching phases...');
-    
-    const pythonProcess = spawn('python', ['-m', 'property_recommender.data_gathering.orchestrator'], {
-      cwd: process.cwd(),
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-
-    pythonProcess.stdout.on('data', (data) => {
-      console.log('Pipeline output:', data.toString());
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      console.error('Pipeline error:', data.toString());
-    });
-
-    pythonProcess.on('close', (code) => {
-      console.log(`Data gathering exited with code ${code}`);
-      if (code === 0) {
-        // Now run the match reasoning phase
-        console.log('Running match reasoning phase...');
-        const matchProcess = spawn('python', ['-m', 'property_recommender.match_reasoning.orchestrator'], {
-          cwd: process.cwd(),
-          stdio: ['pipe', 'pipe', 'pipe']
+    // Parse the output and send to the frontend
+    if (output.includes('Assistant:') || output.includes('A:')) {
+      // Extract the assistant message
+      const assistantMessage = output.split('Assistant:')[1] || output.split('A:')[1];
+      if (assistantMessage) {
+        socket.emit('assistant_message', {
+          content: assistantMessage.trim(),
+          timestamp: Date.now()
         });
-
-        matchProcess.stdout.on('data', (data) => {
-          console.log('Match output:', data.toString());
-        });
-
-        matchProcess.stderr.on('data', (data) => {
-          console.error('Match error:', data.toString());
-        });
-
-        matchProcess.on('close', (matchCode) => {
-          console.log(`Match reasoning exited with code ${matchCode}`);
-          if (matchCode === 0) {
-            console.log('Pipeline completed successfully');
-            resolve();
-          } else {
-            console.error(`Match reasoning failed with code ${matchCode}`);
-            reject(new Error(`Match reasoning failed with code ${matchCode}`));
-          }
-        });
-
-        matchProcess.on('error', (error) => {
-          console.error('Failed to start match reasoning:', error);
-          reject(error);
-        });
-      } else {
-        console.error(`Data gathering failed with code ${code}`);
-        reject(new Error(`Data gathering failed with code ${code}`));
       }
-    });
+    }
+    
+    // Check if pipeline completed successfully
+    if (output.includes('Pipeline completed') || output.includes('property_matches.json')) {
+      // Try to load and send results
+      const resultsPath = path.join(process.cwd(), 'property_matches.json');
+      if (fs.existsSync(resultsPath)) {
+        const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+        socket.emit('results_ready', {
+          results: results.slice(0, 5), // Top 5 matches
+          timestamp: Date.now()
+        });
+      }
+    }
+  });
 
-    pythonProcess.on('error', (error) => {
-      console.error('Failed to start data gathering:', error);
-      reject(error);
+  pythonProcess.stderr.on('data', (data) => {
+    console.error('Pipeline error:', data.toString());
+  });
+
+  pythonProcess.on('close', (code) => {
+    console.log(`Pipeline process exited with code ${code}`);
+    activePipelines.delete(sessionId);
+    
+    if (code === 0) {
+      // Try to load results one more time
+      const resultsPath = path.join(process.cwd(), 'property_matches.json');
+      if (fs.existsSync(resultsPath)) {
+        const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+        socket.emit('results_ready', {
+          results: results.slice(0, 5),
+          timestamp: Date.now()
+        });
+      }
+    } else {
+      socket.emit('pipeline_error', {
+        message: 'Pipeline encountered an error. Please try again.',
+        timestamp: Date.now()
+      });
+    }
+  });
+
+  pythonProcess.on('error', (error) => {
+    console.error('Failed to start pipeline:', error);
+    socket.emit('pipeline_error', {
+      message: 'Failed to start the recommendation engine.',
+      timestamp: Date.now()
     });
   });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
+// Fallback REST endpoints for compatibility
+app.get('/api/sessions/:sessionId/messages', (req, res) => {
+  res.json([]);
+});
+
+app.post('/api/sessions/:sessionId/messages', (req, res) => {
+  res.json({ message: 'Use WebSocket connection for real-time chat' });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });

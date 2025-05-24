@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { apiRequest, queryClient } from '@/lib/queryClient'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, Send, Home, DollarSign, MapPin } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
+  results?: PropertyMatch[]
 }
 
 interface PropertyMatch {
@@ -20,218 +14,217 @@ interface PropertyMatch {
   rationale: string
 }
 
-interface SessionResponse {
-  status: 'active' | 'processing' | 'complete'
-  results?: PropertyMatch[]
-  message?: string
-}
-
 export default function Chat() {
-  const [sessionId, setSessionId] = useState<string>('')
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [sessionId] = useState(() => Math.random().toString(36).substring(7));
+  const socketRef = useRef<Socket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Start a new session
-  const startSessionMutation = useMutation({
-    mutationFn: () => apiRequest('/start-session', { method: 'POST' }),
-    onSuccess: (data) => {
-      setSessionId(data.sessionId)
-      setMessages([{
-        role: 'assistant',
-        content: data.message,
-        timestamp: Date.now()
-      }])
-    }
-  })
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  // Send a message
-  const sendMessageMutation = useMutation({
-    mutationFn: (message: string) => 
-      apiRequest(`/chat/${sessionId}`, {
-        method: 'POST',
-        body: JSON.stringify({ message })
-      }),
-    onSuccess: (data) => {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.message,
-        timestamp: Date.now()
-      }])
-      if (data.status === 'processing') {
-        setIsProcessing(true)
-      }
-    }
-  })
-
-  // Poll for session status when processing
-  const { data: sessionData } = useQuery<SessionResponse>({
-    queryKey: [`/session/${sessionId}`],
-    enabled: isProcessing && !!sessionId,
-    refetchInterval: 3000,
-  })
-
-  // Handle session status updates
   useEffect(() => {
-    if (sessionData?.status === 'complete' && sessionData.results) {
-      setIsProcessing(false)
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    // Connect to WebSocket
+    const socket = io();
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+      setIsConnected(true);
+      
+      // Start the chat session automatically
+      socket.emit('start_chat', sessionId);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+      setIsConnected(false);
+    });
+
+    socket.on('assistant_message', (data) => {
+      console.log('Received assistant message:', data);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: sessionData.message || 'Results are ready!',
-        timestamp: Date.now()
-      }])
-    }
-  }, [sessionData])
+        content: data.content,
+        timestamp: data.timestamp
+      }]);
+    });
 
-  const handleSendMessage = () => {
-    if (!input.trim() || !sessionId) return
+    socket.on('results_ready', (data) => {
+      console.log('Received results:', data);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Great! I found ${data.results.length} properties that match your criteria. Here are the top recommendations:`,
+        timestamp: data.timestamp,
+        results: data.results
+      }]);
+    });
+
+    socket.on('pipeline_error', (data) => {
+      console.log('Pipeline error:', data);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.message,
+        timestamp: data.timestamp
+      }]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [sessionId]);
+
+  const sendMessage = () => {
+    if (!input.trim() || !socketRef.current) return;
 
     const userMessage: Message = {
       role: 'user',
       content: input,
       timestamp: Date.now()
-    }
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    sendMessageMutation.mutate(input)
-    setInput('')
-  }
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Send message to server via WebSocket
+    socketRef.current.emit('user_message', {
+      sessionId,
+      message: input
+    });
+
+    setInput('');
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+      e.preventDefault();
+      sendMessage();
     }
-  }
-
-  // Start session on component mount
-  useEffect(() => {
-    if (!sessionId) {
-      startSessionMutation.mutate()
-    }
-  }, [])
-
-  const formatScore = (score: number) => {
-    return `${Math.round(score * 100)}%`
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 0.8) return 'bg-green-500'
-    if (score >= 0.6) return 'bg-yellow-500'
-    return 'bg-orange-500'
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto max-w-4xl p-4">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Property Recommendation Assistant
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Find your perfect property with AI-powered recommendations
-          </p>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm font-bold">🏠</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Property Recommendation Assistant</h1>
+            <p className="text-sm text-gray-600">Find your perfect property with AI-powered recommendations</p>
+          </div>
+          <div className="ml-auto">
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              {isConnected ? '● Connected' : '● Disconnected'}
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="grid gap-6">
-          {/* Chat Section */}
-          <Card className="h-96">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                Chat with your Property Assistant
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-64 p-4">
-                <div className="space-y-4">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          message.role === 'user'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                        }`}
-                      >
-                        {message.content}
-                      </div>
-                    </div>
-                  ))}
-                  {(sendMessageMutation.isPending || isProcessing) && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-lg">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      </div>
-                    </div>
-                  )}
+      {/* Chat Messages */}
+      <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {/* Welcome message */}
+          {messages.length === 0 && (
+            <div className="bg-white rounded-lg p-6 border">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-sm">🤖</span>
                 </div>
-              </ScrollArea>
-              
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Tell me about your property preferences..."
-                    disabled={sendMessageMutation.isPending || isProcessing}
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={!input.trim() || sendMessageMutation.isPending || isProcessing}
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                <div className="flex-1">
+                  <p className="text-gray-900 font-medium mb-2">Chat with your Property Assistant</p>
+                  <p className="text-gray-600 mb-4">
+                    Welcome! I'll help you find the perfect property. Please tell me about your preferences...
+                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-blue-800 text-sm">
+                      <strong>Pete is starting up...</strong> The conversation will begin automatically once connected.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
-          {/* Results Section */}
-          {sessionData?.results && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Home className="w-5 h-5" />
-                  Property Recommendations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {sessionData.results.map((match: PropertyMatch, index) => (
-                    <div
-                      key={match.property_id}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="secondary" className="text-sm">
-                            #{index + 1}
-                          </Badge>
-                          <span className="font-semibold text-lg">
-                            Property ID: {match.property_id}
-                          </span>
-                        </div>
-                        <Badge className={`${getScoreColor(match.score)} text-white`}>
-                          {formatScore(match.score)} Match
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {match.rationale}
-                      </p>
+          {/* Chat messages */}
+          {messages.map((message, index) => (
+            <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-3xl ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border'} rounded-lg p-4`}>
+                {message.role === 'assistant' && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">🤖</span>
                     </div>
-                  ))}
+                    <span className="font-medium text-gray-900">Pete</span>
+                  </div>
+                )}
+                
+                <p className={`${message.role === 'user' ? 'text-white' : 'text-gray-900'} whitespace-pre-wrap`}>
+                  {message.content}
+                </p>
+
+                {/* Property Results */}
+                {message.results && message.results.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    {message.results.map((match: PropertyMatch, matchIndex) => (
+                      <div key={matchIndex} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium text-gray-900">Property #{match.property_id}</h4>
+                          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                            {Math.round(match.score * 100)}% match
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm">{match.rationale}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="bg-white border-t px-6 py-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Tell me about your property preferences..."
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={!isConnected}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || !isConnected}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Send
+            </button>
+          </div>
+          {!isConnected && (
+            <p className="text-red-600 text-sm mt-2">Connecting to property recommendation system...</p>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -62,6 +62,10 @@ def main():
         "--match-mode", choices=["batch", "individual"], default="individual",
         help="Matching mode: batch ranking vs per-record scoring."
     )
+    parser.add_argument(
+        "--max-records", type=int, default=10,
+        help="Maximum number of property records to fetch for faster processing."
+    )
     args = parser.parse_args()
 
     # 1. Profile collection

@@ -1,20 +1,21 @@
 {
-  "narrative_summary": "John is looking for a property near Auckland University. He needs at least two bedrooms and has a budget cap of 2 million NZD. He's flexible about the type of property and is ready to make a purchase whenever the right opportunity arises.",
+  "narrative_summary": "John is looking for a house near the university in Christchurch. He requires a property with at least two bedrooms and two bathrooms, and his budget is under a million NZD. His main priority is proximity to the university.",
   "structured_needs": {
     "bedrooms": {
       "min": 2
     },
+    "bathrooms": {
+      "min": 2
+    },
     "budget": {
-      "max": 2000000
+      "max": 1000000
     },
     "locations": [
-      "Auckland"
-    ],
-    "timeline": "ready to buy whenever"
+      "Christchurch"
+    ]
   },
   "key_insights": [
-    "needs proximity to Auckland University",
-    "ready to buy immediately",
-    "flexible on property type"
+    "looking near university",
+    "budget under a million"
   ]
 }

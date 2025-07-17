@@ -1,0 +1,52 @@
+[
+  {
+    "property_id": 2149692182,
+    "score": 0.9,
+    "rationale": "This property is located in Christchurch City, which aligns with John's location preference. It meets the bedroom and bathroom requirements with two bedrooms and two bathrooms. Additionally, its price of 'Enquiries over $500,000' fits well within John's budget of under a million NZD. The only missing detail is the exact proximity to the university, which is crucial, but given the general location, it's likely quite close."
+  },
+  {
+    "property_id": 2149485947,
+    "score": 0.9,
+    "rationale": "The property has 3 bedrooms and 3 bathrooms, meeting the user's requirements for at least 2 bedrooms and 2 bathrooms. It's located in Christchurch City, aligning with John's preference for proximity to the university. The price of $635,000 is well within his budget of under a million NZD. The only potential downside is the suburb of Heathcote, which may not be as close to the university as other areas in Christchurch City, slightly affecting the proximity requirement."
+  },
+  {
+    "property_id": 2149422112,
+    "score": 0.9,
+    "rationale": "The property is located in Christchurch, satisfying the location requirement. It has 4 bedrooms and 2 bathrooms, exceeding the minimum needs. The asking price of $260,000 is well within the budget of under a million NZD. However, the listing does not specify proximity to the university, which is a priority for John. Hence, the score is slightly reduced."
+  },
+  {
+    "property_id": 2149421446,
+    "score": 0.9,
+    "rationale": "The property has 4 bedrooms and 2 bathrooms, exceeding John's requirements. It's located in Christchurch City, near the university, which is John's main priority. The price is within budget, listed as 'Enquiries over $645,000', making it a strong match."
+  },
+  {
+    "property_id": 2149541924,
+    "score": 0.8,
+    "rationale": "The property is located in Christchurch, close to the university, meeting John's main priority. It has the required two bedrooms and exceeds the bathroom requirement with three bathrooms. However, the listing is for auction, meaning the price could potentially exceed John's budget under a million NZD, which affects the score."
+  },
+  {
+    "property_id": 2149429213,
+    "score": 0.8,
+    "rationale": "The property is located in Christchurch City, which aligns with the location preference. It has 5 bedrooms and 3 bathrooms, exceeding the minimum requirement. The property is being sold by auction, so the price is uncertain, but it might fit within the budget. Proximity to the university is not explicitly mentioned, which is the primary preference, hence a score of 0.8."
+  },
+  {
+    "property_id": 2149429212,
+    "score": 0.8,
+    "rationale": "The property is located in Christchurch City, which is a suitable location as per the user's preference. It offers 5 bedrooms and 3 bathrooms, exceeding the user's minimum requirements of 2 bedrooms and 2 bathrooms. However, the price is unspecified as it is sold by auction, which introduces uncertainty regarding the budget constraint of under a million NZD. The location is not specifically near the university, which is a key priority for the user, affecting the proximity score."
+  },
+  {
+    "property_id": 2149421464,
+    "score": 0.8,
+    "rationale": "The property is located in Christchurch City, which aligns with John's location preference. It has 5 bedrooms and 3 bathrooms, exceeding John's minimum requirement of 2 bedrooms and 2 bathrooms. However, the price is not specified and it is to be sold by auction, which may exceed John's budget of under a million NZD. The proximity to the university is unclear, impacting the score."
+  },
+  {
+    "property_id": 2149462162,
+    "score": 0.75,
+    "rationale": "The property is located in Christchurch, meeting the location requirement. It has the required 3 bedrooms and 2 bathrooms. However, the price is not specified and is to be determined by auction, which might exceed the budget of under a million NZD. Additionally, the location is in South New Brighton, which may not be very close to the university, affecting the priority of proximity."
+  },
+  {
+    "property_id": 2149421465,
+    "score": 0.7,
+    "rationale": "The property is located in Christchurch, which meets the location requirement. It has more than the minimum required bedrooms and bathrooms (5 bedrooms, 3 bathrooms). However, the price is not specified and is to be determined by auction, which introduces uncertainty regarding whether it fits within the budget under a million NZD. Additionally, the proximity to the university is not explicitly stated, which is a primary concern for John."
+  }
+]
